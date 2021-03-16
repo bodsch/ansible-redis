@@ -1,0 +1,62 @@
+---
+
+_redis_packages:
+  default:
+    - redis-server
+  redhat:
+    - redis
+  archlinux:
+    - redis
+
+redis_packages: "{{
+          _redis_packages[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
+  default(_redis_packages[ansible_os_family | lower] |
+  default(_redis_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+  default(_redis_packages[ansible_distribution | lower] |
+  default(_redis_packages['default'])))) }}"
+
+_redis_config_file:
+  default: /etc/redis/redis.conf
+  redhat: /etc/redis.conf
+  archlinux: /etc/redis.conf
+
+redis_config_file: "{{
+          _redis_config_file[ansible_os_family | lower] |
+  default(_redis_config_file['default']) }}"
+
+_redis_daemon:
+  default: redis-server
+  redhat: redis
+  archlinux: redis
+
+redis_daemon: "{{
+          _redis_daemon[ansible_os_family | lower] |
+  default(_redis_daemon['default']) }}"
+
+
+_systemd_lib_directory:
+  default: /lib/systemd/system
+  debian: /lib/systemd/system
+  redhat: /usr/lib/systemd/system
+
+systemd_lib_directory: "{{
+          _systemd_lib_directory[ansible_os_family | lower] |
+  default(_systemd_lib_directory['default']) }}"
+
+# # arch
+# __redis_package: redis
+# redis_daemon: redis
+# redis_conf_path: /etc/redis.conf
+#
+# # debian
+# __redis_package: redis-server
+# redis_daemon: redis-server
+# redis_conf_path: /etc/redis/redis.conf
+# redis_conf_mode: 0640
+#
+#
+# # redhat
+# __redis_package: redis
+# redis_daemon: redis
+# redis_conf_path: /etc/redis.conf
+# redis_conf_mode: 0644

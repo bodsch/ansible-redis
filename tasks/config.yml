@@ -1,0 +1,44 @@
+---
+
+- name: create logging directory {{ redis_general_logfile | dirname }}
+  file:
+    path: "{{ redis_general_logfile | dirname }}"
+    state: directory
+    owner: redis
+    mode: 0755
+
+- name: write splitted redis configuration
+  template:
+    src: redis.d/{{ item }}.j2
+    dest: /etc/redis.d/{{ item }}
+    mode: 0644
+  loop:
+    - active_defragmentation.conf
+    - advanced_config.conf
+    - append_only.conf
+    - clients.conf
+    - cluster_docker_nat.conf
+    - event_notification.conf
+    - general.conf
+    - latency_monitor.conf
+    - lazy_freeing.conf
+    - lua_scripting.conf
+    - memory_management.conf
+    - network.conf
+    - redis_cluster.conf
+    - replication.conf
+    - security.conf
+    - slow_log.conf
+    - snapshotting.conf
+  notify:
+    - restart redis
+
+
+- name: write redis configuration
+  template:
+    src: redis.conf.j2
+    dest: "{{ redis_config_file }}"
+    mode: 0644
+    backup: true
+  notify:
+    - restart redis

@@ -1,0 +1,6 @@
+---
+
+- name: ensure Redis is installed.
+  package:
+    name: "{{ redis_packages }}"
+    state: present

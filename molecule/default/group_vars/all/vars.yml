@@ -1,0 +1,5 @@
+---
+
+redis_general_loglevel: verbose
+
+...

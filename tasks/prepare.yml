@@ -1,0 +1,19 @@
+---
+
+- name: update apt cache
+  apt:
+    update_cache: true
+  when:
+    - ansible_os_family | lower == 'debian'
+
+- name: update pacman cache
+  pacman:
+    update_cache: true
+  when:
+    - ansible_os_family | lower == 'archlinux'
+
+- name: create config directory {{ redis_include_path }}
+  file:
+    path: "{{ redis_include_path }}"
+    state: directory
+    mode: 0755
