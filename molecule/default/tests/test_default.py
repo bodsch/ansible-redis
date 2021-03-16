@@ -6,7 +6,6 @@ from ansible.template import Templar
 
 import pytest
 import os
-import json
 
 import testinfra.utils.ansible_runner
 
@@ -31,17 +30,14 @@ def base_directory():
     return directory, molecule_directory
 
 
-"""
-    parse ansible variables
-    - defaults/main.yml
-    - vars/main.yml
-    - molecule/${MOLECULE_SCENARIO_NAME}/group_vars/all/vars.yml
-"""
-
-
 @pytest.fixture()
 def get_vars(host):
-    """ ... """
+    """
+        parse ansible variables
+        - defaults/main.yml
+        - vars/main.yml
+        - molecule/${MOLECULE_SCENARIO_NAME}/group_vars/all/vars.yml
+    """
     base_dir, molecule_dir = base_directory()
 
     file_defaults = "file={}/defaults/main.yml name=role_defaults".format(base_dir)
@@ -104,4 +100,3 @@ def test_open_port(host, ports):
 
     application = host.socket("tcp://%s" % (ports))
     assert application.is_listening
-
