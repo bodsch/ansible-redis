@@ -6,19 +6,19 @@ redis_include_path: /etc/redis.d
 
 redis_includes:
   - active_defragmentation.conf
-  - advanced_config.conf
-  - append_only.conf
+  # - advanced_config.conf
+  # - append_only.conf
   - clients.conf
   - cluster_docker_nat.conf
   - event_notification.conf
   - general.conf
   - latency_monitor.conf
-  - lazy_freeing.conf
+  # - lazy_freeing.conf
   - lua_scripting.conf
   - memory_management.conf
   - network.conf
   - redis_cluster.conf
-  - replication.conf
+  # - replication.conf
   - security.conf
   - slow_log.conf
   - snapshotting.conf
