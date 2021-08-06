@@ -1,5 +1,5 @@
 ---
-name: CI
+name: master-replica
 
 on:
   pull_request:
