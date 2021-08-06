@@ -1,0 +1,13 @@
+---
+
+redis_packages:
+  - redis
+  - iproute
+
+redis_config_file: /etc/redis.conf
+
+redis_daemon: redis
+
+systemd_lib_directory: /usr/lib/systemd/system
+
+...

@@ -49,6 +49,10 @@ redis_network_unixsocket_perm: 0700
 redis_network_timeout: 300
 redis_network_tcp_timeout: 300
 
+# replication
+redis_replication_master_ip: ""
+redis_replication_master_port: 6379
+
 # security
 redis_security_requirepass: ""
 redis_security_disabled_command: []

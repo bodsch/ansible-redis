@@ -1,19 +1,41 @@
 ---
 
-- name: update apt cache
-  apt:
-    update_cache: true
-  when:
-    - ansible_os_family | lower == 'debian'
+- name: include OS specific configuration ({{ ansible_distribution }} ({{ ansible_os_family }}) {{ ansible_distribution_major_version }})
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      paths:
+        - "vars"
+      files:
+        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+        # eg. debian / ubuntu / centos / oraclelinux
+        - "{{ ansible_distribution | lower }}.yaml"
+        # eg. redhat / debian
+        - "{{ ansible_os_family | lower }}.yaml"
+        - default.yaml
+      skip: true
 
-- name: update pacman cache
-  pacman:
+- name: update package cache
+  package:
     update_cache: true
-  when:
-    - ansible_os_family | lower == 'archlinux'
+
+# - name: update apt cache
+#   apt:
+#     update_cache: true
+#   when:
+#     - ansible_os_family | lower == 'debian'
+#
+# - name: update pacman cache
+#   pacman:
+#     update_cache: true
+#   when:
+#     - ansible_os_family | lower == 'archlinux'
 
 - name: create config directory {{ redis_include_path }}
   file:
     path: "{{ redis_include_path }}"
     state: directory
     mode: 0755
+
+...
