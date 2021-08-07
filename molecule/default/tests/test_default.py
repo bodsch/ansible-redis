@@ -65,6 +65,14 @@ def get_vars(host):
     return result
 
 
+def test_package(host, get_vars):
+    packages = get_vars.get("redis_packages")
+
+    for pack in packages:
+        p = host.package(pack)
+        assert p.is_installed
+
+
 @pytest.mark.parametrize("dirs", [
     "/etc/redis.d",
 ])
@@ -92,18 +100,19 @@ def test_user(host):
 
 
 def test_service(host):
-    service = host.service("redis")
+    service_name = get_vars.get("redis_daemon")
+
+    service = host.service(service_name)
     assert service.is_enabled
     assert service.is_running
 
 
-@pytest.mark.parametrize("ports", [
-    '127.0.0.1:6379',
-])
-def test_open_port(host, ports):
-
+def test_open_port(host, get_vars):
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    application = host.socket("tcp://%s" % (ports))
-    assert application.is_listening
+    bind_address = get_vars.get("redis_network_bind")
+    bind_port = get_vars.get("redis_network_port")
+
+    service = host.socket("tcp://{0}:{1}".format(bind_address, bind_port))
+    assert service.is_listening
