@@ -34,7 +34,6 @@ jobs:
           VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
 
-
   arch:
     name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
     needs:
