@@ -1,7 +1,5 @@
 ---
 
-redis_install: true
-
 redis_include_path: /etc/redis.d
 
 redis_includes:

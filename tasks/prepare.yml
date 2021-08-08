@@ -41,7 +41,7 @@
   package:
     update_cache: true
 
-- name: create config directory {{ redis_include_path }}
+- name: create include directory {{ redis_include_path }}
   file:
     path: "{{ redis_include_path }}"
     state: directory

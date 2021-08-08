@@ -7,7 +7,7 @@
     owner: redis
     mode: 0755
 
-- name: write splitted redis configuration
+- name: create splitted redis configuration
   template:
     src: redis.d/{{ item }}.j2
     dest: /etc/redis.d/{{ item }}
@@ -33,7 +33,6 @@
   notify:
     - restart redis
 
-
 - name: write redis configuration
   template:
     src: redis.conf.j2
@@ -42,3 +41,5 @@
     backup: true
   notify:
     - restart redis
+
+...
