@@ -99,7 +99,7 @@ def test_user(host):
     assert host.user("redis").home == "/var/lib/redis"
 
 
-def test_service(host):
+def test_service(host, get_vars):
     service_name = get_vars.get("redis_daemon")
 
     service = host.service(service_name)
