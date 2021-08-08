@@ -4,3 +4,8 @@
   package:
     name: "{{ redis_packages }}"
     state: present
+
+- name: get latest system information
+  setup:
+
+...

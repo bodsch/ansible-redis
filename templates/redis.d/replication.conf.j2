@@ -21,6 +21,12 @@
 #    and resynchronize with them.
 #
 # replicaof <masterip> <masterport>
+{% if redis_replication_master_ip is defined and
+  redis_replication_master_ip | length > 0 and
+  redis_replication_master_ip | ipaddr('address') and
+  (not redis_replication_master_ip == ansible_default_ipv4.address) %}
+replicaof {{ redis_replication_master_ip }} {{ redis_replication_master_port | default('6379') }}
+{% endif %}
 
 # If the master is password protected (using the "requirepass" configuration
 # directive below) it is possible to tell the replica to authenticate before

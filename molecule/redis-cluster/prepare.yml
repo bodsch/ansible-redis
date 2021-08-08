@@ -3,10 +3,6 @@
   hosts: all
   gather_facts: true
 
-  environment:
-    NETRC: ''
-
-
   pre_tasks:
     - debug:
         msg:

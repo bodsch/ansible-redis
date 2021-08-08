@@ -1,0 +1,82 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+  flake8 .
+
+platforms:
+  - name: "redis_cluster_master"
+    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - redis
+    docker_networks:
+      - name: redis_cluster
+        ipam_config:
+          - subnet: "10.12.0.0/16"
+            gateway: "10.12.0.254"
+    networks:
+      - name: redis_cluster
+        ipv4_address: "10.12.0.1"
+
+  - name: "redis_cluster_replica_1"
+    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - redis
+    networks:
+      - name: redis_cluster
+        ipv4_address: "10.12.0.2"
+
+  - name: "redis_cluster_replica_2"
+    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - redis
+    networks:
+      - name: redis_cluster
+        ipv4_address: "10.12.0.3"
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      deprecation_warnings: True
+      stdout_callback: yaml
+
+scenario:
+  test_sequence:
+    - lint
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
+
+verifier:
+  name: testinfra
