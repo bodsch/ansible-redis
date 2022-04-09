@@ -3,7 +3,7 @@
 
 Install and configure a redis server, or redis-cluster.
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-icinga2/CI)][ci]
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-redis/CI)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-redis)][issues]
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-redis)][releases]
 
@@ -14,11 +14,17 @@ Install and configure a redis server, or redis-cluster.
 
 ## tested operating systems
 
-* Debian 9 / 10
-* Ubuntu 18.04 / 20.04
-* CentOS 7 / 8
-* Oracle Linux 7 / 8
-* Arch Linux
+Tested on
+
+* ArchLinux
+* ArtixLinux
+* Debian based
+    - Debian 10 / 11
+    - Ubuntu 20.04
+* RedHat based
+    - Alma Linux 8
+    - Rocky Linux 8
+    - OracleLinux 8
 
 
 ## usage
@@ -91,3 +97,15 @@ redis_snapshot_dbfilename: dump.rdb
 redis_snapshot_rdbcompression: false
 redis_snapshot_dbdir: /var/lib/redis
 ```
+
+---
+
+## Author
+
+- Bodo Schulz
+
+## License
+
+[Apache](LICENSE)
+
+`FREE SOFTWARE, HELL YEAH!`

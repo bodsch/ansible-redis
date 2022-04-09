@@ -13,7 +13,7 @@ lint: |
 
 platforms:
   - name: "redis_cluster_master"
-    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    image: "bodsch/ansible-${DISTRIBUTION:-ubuntu:20.04}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
@@ -32,7 +32,7 @@ platforms:
         ipv4_address: "10.12.0.1"
 
   - name: "redis_cluster_replica_1"
-    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    image: "bodsch/ansible-${DISTRIBUTION:-ubuntu:20.04}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
@@ -46,7 +46,7 @@ platforms:
         ipv4_address: "10.12.0.2"
 
   - name: "redis_cluster_replica_2"
-    image: "diodonfrost/ansible-${DISTRIBUTION:-ubuntu:20.04}"
+    image: "bodsch/ansible-${DISTRIBUTION:-ubuntu:20.04}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
