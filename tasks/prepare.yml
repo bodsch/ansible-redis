@@ -8,12 +8,14 @@
         - "vars"
       files:
         # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
-        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
         # eg. debian / ubuntu / centos / oraclelinux
-        - "{{ ansible_distribution | lower }}.yaml"
+        - "{{ ansible_distribution | lower }}.yml"
         # eg. redhat / debian
-        - "{{ ansible_os_family | lower }}.yaml"
-        - default.yaml
+        - "{{ ansible_os_family | lower }}.yml"
+        # artixlinux
+        - "{{ ansible_os_family | lower | replace(' ', '') }}.yml"
+        - default.yml
       skip: true
 
 - block:

@@ -13,7 +13,8 @@
           command: |
             pacman --refresh --sync --sysupgrade --noconfirm
       when:
-        - ansible_distribution | lower == 'archlinux'
+        - ansible_distribution | lower == 'archlinux' or
+          ansible_os_family | lower == 'artix linux'
 
     - debug:
         msg:

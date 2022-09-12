@@ -33,23 +33,23 @@ def base_directory():
         molecule_directory = "."
     else:
         directory = "."
-        molecule_directory = "molecule/{}".format(os.environ.get('MOLECULE_SCENARIO_NAME'))
+        molecule_directory = f"molecule/{os.environ.get('MOLECULE_SCENARIO_NAME')}"
 
     return directory, molecule_directory
 
 
 def read_ansible_yaml(file_name, role_name):
-    ext_arr = ["yml", "yaml"]
-
+    """
+    """
     read_file = None
 
-    for e in ext_arr:
-        test_file = "{}.{}".format(file_name, e)
+    for e in ["yml", "yaml"]:
+        test_file = f"{file_name}.{e}"
         if os.path.isfile(test_file):
             read_file = test_file
             break
 
-    return "file={} name={}".format(read_file, role_name)
+    return f"file={read_file} name={role_name}"
 
 
 @pytest.fixture()
@@ -63,21 +63,23 @@ def get_vars(host):
     """
     base_dir, molecule_dir = base_directory()
     distribution = host.system_info.distribution
+    release = host.system_info.release
+    operation_system = None
 
     if distribution in ['debian', 'ubuntu']:
-        os = "debian"
+        operation_system = "debian"
     elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        os = "redhat"
-    elif distribution in ['arch']:
-        os = "archlinux"
+        operation_system = "redhat"
+    elif distribution in ['arch', 'artix']:
+        operation_system = f"{distribution}linux"
 
-    print(" -> {} / {}".format(distribution, os))
+    print(f"distribution: {distribution}")
+    print(f"release     : {release}")
 
-    file_defaults      = read_ansible_yaml("{}/defaults/main".format(base_dir), "role_defaults")
-    file_vars          = read_ansible_yaml("{}/vars/main".format(base_dir), "role_vars")
-    file_distibution   = read_ansible_yaml("{}/vars/{}".format(base_dir, os), "role_distibution")
-    file_molecule      = read_ansible_yaml("{}/group_vars/all/vars".format(base_dir), "test_vars")
-    # file_host_molecule = read_ansible_yaml("{}/host_vars/{}/vars".format(base_dir, HOST), "host_vars")
+    file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
+    file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
+    file_molecule = f"file={molecule_dir}/group_vars/all/vars.yml name=test_vars"
+    file_distibution = f"file={base_dir}/vars/{operation_system}.yml name=role_distibution"
 
     defaults_vars      = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars          = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
@@ -98,11 +100,18 @@ def get_vars(host):
 
 
 def test_package(host, get_vars):
-    packages = get_vars.get("redis_packages")
+    distribution = host.system_info.distribution
+    release = host.system_info.release
 
-    for pack in packages:
-        p = host.package(pack)
-        assert p.is_installed
+    print(f"distribution: {distribution}")
+    print(f"release     : {release}")
+
+    if not distribution == "artix":
+        packages = get_vars.get("redis_packages")
+
+        for pack in packages:
+            p = host.package(pack)
+            assert p.is_installed
 
 
 @pytest.mark.parametrize("dirs", [
@@ -134,6 +143,8 @@ def test_user(host):
 def test_service(host, get_vars):
     service_name = get_vars.get("redis_daemon")
 
+    print(f"redis daemon: {service_name}")
+
     service = host.service(service_name)
     assert service.is_enabled
     assert service.is_running
@@ -143,8 +154,11 @@ def test_open_port(host, get_vars):
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    bind_address = get_vars.get("redis_network_bind")
-    bind_port = get_vars.get("redis_network_port")
+    bind_address = get_vars.get("redis_network_bind", "127.0.0.1")
+    bind_port = get_vars.get("redis_network_port", "6379")
 
-    service = host.socket("tcp://{0}:{1}".format(bind_address, bind_port))
+    print(f"address: {bind_address}")
+    print(f"port   : {bind_port}")
+
+    service = host.socket(f"tcp://{bind_address}:{bind_port}")
     assert service.is_listening
