@@ -74,10 +74,10 @@ def get_vars(host):
     print(f"distribution: {distribution}")
     print(f"release     : {release}")
 
-    file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
-    file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
-    file_molecule = f"file={molecule_dir}/group_vars/all/vars.yml name=test_vars"
-    file_distibution = f"file={base_dir}/vars/{operation_system}.yml name=role_distibution"
+    file_defaults      = read_ansible_yaml(f"{base_dir}/defaults/main", "role_defaults")
+    file_vars          = read_ansible_yaml(f"{base_dir}/vars/main", "role_vars")
+    file_distibution   = read_ansible_yaml(f"{base_dir}/vars/{operation_system}", "role_distibution")
+    file_molecule      = read_ansible_yaml(f"{molecule_dir}/group_vars/all/vars", "test_vars")
 
     defaults_vars      = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars          = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
