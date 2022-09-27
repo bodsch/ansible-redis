@@ -22,6 +22,7 @@ redis_includes:
   - snapshotting.conf
 
 # general
+redis_general: {}
 redis_general_loglevel: notice
 redis_general_logfile: /var/log/redis/redis-server.log
 redis_general_databases: 16

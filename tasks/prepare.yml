@@ -49,4 +49,8 @@
     state: directory
     mode: 0755
 
+- name: merge redis configuration between defaults and custom
+  set_fact:
+    redis_general: "{{redis_defaults_general | combine( redis_general, recursive=True) }}"
+
 ...

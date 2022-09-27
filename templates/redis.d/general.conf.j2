@@ -3,7 +3,7 @@
 
 # By default Redis does not run as a daemon. Use 'yes' if you need it.
 # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
-daemonize {{ redis_general_daemonize | bool | ternary('yes', 'no') }}
+daemonize {{ redis_general.daemonize | bool | ternary('yes', 'no') }}
 
 # If you run Redis from upstart or systemd, Redis can interact with your
 # supervision tree. Options:
@@ -14,7 +14,7 @@ daemonize {{ redis_general_daemonize | bool | ternary('yes', 'no') }}
 #                        UPSTART_JOB or NOTIFY_SOCKET environment variables
 # Note: these supervision methods only signal "process is ready."
 #       They do not enable continuous liveness pings back to your supervisor.
-supervised {{ redis_general_supervised }}
+supervised {{ redis_general.supervised }}
 
 # If a pid file is specified, Redis writes it where specified at startup
 # and removes it at exit.
@@ -33,13 +33,13 @@ pidfile /run/redis/{{ redis_daemon }}.pid
 # verbose (many rarely useful info, but not a mess like the debug level)
 # notice (moderately verbose, what you want in production probably)
 # warning (only very important / critical messages are logged)
-loglevel {{ redis_general_loglevel }}
+loglevel {{ redis_general.loglevel }}
 
 # Specify the log file name. Also the empty string can be used to force
 # Redis to log on the standard output. Note that if you use standard
 # output for logging but daemonize, logs will be sent to /dev/null
 # logfile /var/log/redis/redis-server.log
-logfile {{ redis_general_logfile }}
+logfile {{ redis_general.logfile }}
 
 # To enable logging to the system logger, just set 'syslog-enabled' to yes,
 # and optionally update the other syslog parameters to suit your needs.
@@ -54,7 +54,7 @@ logfile {{ redis_general_logfile }}
 # Set the number of databases. The default database is DB 0, you can select
 # a different one on a per-connection basis using SELECT <dbid> where
 # dbid is a number between 0 and 'databases'-1
-databases {{ redis_general_databases }}
+databases {{ redis_general.databases }}
 
 {% if ansible_distribution_major_version | int > 10 %}
 # By default Redis shows an ASCII art logo only when started to log to the
@@ -63,5 +63,5 @@ databases {{ redis_general_databases }}
 #
 # However it is possible to force the pre-4.0 behavior and always show a
 # ASCII art logo in startup logs by setting the following option to yes.
-always-show-logo {{ redis_general_show_logo | bool | ternary('yes', 'no') }}
+always-show-logo {{ redis_general.show_logo | bool | ternary('yes', 'no') }}
 {% endif %}
