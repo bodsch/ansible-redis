@@ -2,4 +2,9 @@
 
 redis_general_loglevel: verbose
 
+redis_security:
+  requirepass: ""
+  rename_command:
+    CONFIG: "schlurz"
+
 ...

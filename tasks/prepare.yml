@@ -51,6 +51,12 @@
 
 - name: merge redis configuration between defaults and custom
   set_fact:
-    redis_general: "{{redis_defaults_general | combine( redis_general, recursive=True) }}"
+    redis_general: "{{ redis_defaults_general | combine( redis_general, recursive=True) }}"
+    redis_append: "{{ redis_defaults_append | combine( redis_append, recursive=True) }}"
+    redis_memory: "{{ redis_defaults_memory | combine( redis_memory, recursive=True) }}"
+    redis_network: "{{ redis_defaults_network | combine( redis_network, recursive=True) }}"
+    redis_replication: "{{ redis_defaults_replication | combine( redis_replication, recursive=True) }}"
+    redis_security: "{{ redis_defaults_security | combine( redis_security, recursive=True) }}"
+    redis_snapshot: "{{ redis_defaults_snapshot | combine( redis_snapshot, recursive=True) }}"
 
 ...

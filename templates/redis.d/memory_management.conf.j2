@@ -1,5 +1,8 @@
-
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 ############################## MEMORY MANAGEMENT ################################
+{% if redis_memory is defined and
+      redis_memory | count > 0 %}
 
 # Set a memory usage limit to the specified amount of bytes.
 # When the memory limit is reached Redis will try to remove keys
@@ -26,11 +29,10 @@
 #
 # maxmemory <bytes>
 
-{% if redis_memory_maxmemory is defined %}
-maxmemory {{ redis_memory_maxmemory }}
-maxmemory-policy {{ redis_memory_maxmemory_policy }}
-maxmemory-samples {{ redis_memory_maxmemory_samples }}
-{% endif %}
+  {% if redis_memory.maxmemory is defined and
+        redis_memory.maxmemory | string | length > 0 %}
+maxmemory {{ redis_memory.maxmemory }}
+  {% endif %}
 
 # MAXMEMORY POLICY: how Redis will select what to remove when maxmemory
 # is reached. You can select among five behaviors:
@@ -62,10 +64,13 @@ maxmemory-samples {{ redis_memory_maxmemory_samples }}
 # The default is:
 #
 # maxmemory-policy noeviction
-
-{% if redis_memory_maxmemory is defined and redis_memory_maxmemory_policy is defined %}
-maxmemory-policy {{ redis_memory_maxmemory_policy }}
-{% endif %}
+  {% set _memory_policy = "noeviction" %}
+  {% if redis_memory.maxmemory_policy is defined and
+        redis_memory.maxmemory_policy | string | length > 0 and
+        redis_memory.maxmemory_policy in ["volatile-lru", "allkeys-lru", "volatile-lfu", "allkeys-lfu", "volatile-random", "allkeys-random", "volatile-ttl", "noeviction"] %}
+    {% set _memory_policy = redis_memory.maxmemory_policy %}
+  {% endif %}
+maxmemory-policy {{ _memory_policy }}
 
 # LRU, LFU and minimal TTL algorithms are not precise algorithms but approximated
 # algorithms (in order to save memory), so you can tune it for speed or
@@ -77,10 +82,10 @@ maxmemory-policy {{ redis_memory_maxmemory_policy }}
 # true LRU but costs more CPU. 3 is faster but not very accurate.
 #
 # maxmemory-samples 5
-{% if redis_memory_maxmemory is defined and redis_memory_maxmemory_samples is defined %}
-maxmemory-samples {{ redis_memory_maxmemory_samples }}
-{% endif %}
-
+  {% if redis_memory.maxmemory_samples is defined and
+        redis_memory.maxmemory_samples | string | length > 0 %}
+maxmemory-samples {{ redis_memory.maxmemory_samples }}
+  {% endif %}
 
 # Starting from Redis 5, by default a replica will ignore its maxmemory setting
 # (unless it is promoted to master after a failover or manually). It means
@@ -101,3 +106,4 @@ maxmemory-samples {{ redis_memory_maxmemory_samples }}
 # the configured maxmemory setting.
 #
 # replica-ignore-maxmemory yes
+{% endif %}

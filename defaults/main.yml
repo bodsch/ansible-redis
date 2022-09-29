@@ -31,16 +31,19 @@ redis_general_daemonize: true
 redis_general_supervised: auto
 
 # append_only
+redis_append: {}
 redis_append_only: false
 redis_append_filename: appendonly.aof
 redis_append_fsync: everysec
 
 # memory_management
+redis_memory: {}
 redis_memory_maxmemory: 0
 redis_memory_maxmemory_policy: "noeviction"
 redis_memory_maxmemory_samples: 5
 
 # network
+redis_network: {}
 redis_network_port: 6379
 redis_network_bind: 127.0.0.1
 redis_network_unixsocket: ''
@@ -49,14 +52,17 @@ redis_network_timeout: 300
 redis_network_tcp_timeout: 300
 
 # replication
+redis_replication: {}
 redis_replication_master_ip: ""
 redis_replication_master_port: 6379
 
 # security
+redis_security: {}
 redis_security_requirepass: ""
 redis_security_disabled_command: []
 
 # snapshotting
+redis_snapshot: {}
 # Set to an empty set to disable persistence (saving the DB to disk).
 redis_snapshot_save:
   - 900 1

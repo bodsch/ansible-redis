@@ -18,6 +18,60 @@ redis_defaults_general:
   daemonize: true
   supervised: auto
 
+redis_defaults_append:
+  only: false
+  filename: appendonly.aof
+  fsync: everysec
+
+redis_defaults_memory:
+  maxmemory: 0
+  maxmemory_policy: noeviction
+  maxmemory_samples: 5
+  replica_ignore_maxmemory: true
+
+redis_defaults_network:
+  bind: 127.0.0.1
+  port: 6379
+  tcp_backlog: 511
+  unixsocket: ''
+  unixsocket_perm: 0700
+  timeout: 300
+  tcp_keepalive: 300
+
+redis_defaults_replication:
+  master_ip: ""
+  master_port: 6379
+  # masterauth: ""
+  # replica_serve_stale_data: true
+  # replica_read_only: yes
+  # repl_diskless_sync: no
+  # repl_diskless_sync_delay: 5
+  # repl_ping_replica_period: 10
+  # repl_timeout: 60
+  # repl_disable_tcp_nodelay: no
+  # repl_backlog_size: 1mb
+  # repl_backlog_ttl: 3600
+  # replica_priority: 100
+  # min_replicas_to_write: 3
+  # min_replicas_max_lag: 10
+  # replica_announce_ip: 5.5.5.5
+  # replica_announce_port: 1234
+
+redis_defaults_security:
+  requirepass: ""
+  rename_command: {}
+
+redis_defaults_snapshot:
+  save:
+  - 900 1
+  - 300 10
+  - 60 10000
+  dbfilename: dump.rdb
+  rdbcompression: false
+  dbdir: /var/lib/redis
+
+#redis_defaults_sentinel:
+
 # ------------------------------------------------------------------------------------------------
 
 systemd_lib_directory: /lib/systemd/system
