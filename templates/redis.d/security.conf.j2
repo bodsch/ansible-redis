@@ -39,9 +39,9 @@ requirepass {{ redis_security.requirepass }}
 # Please note that changing the name of commands that are logged into the
 # AOF file or transmitted to replicas may cause problems.
 
-{% if redis_security.rename_command is defined and
-      redis_security.rename_command | count > 0 %}
-  {% for command, renamed in redis_security.rename_command.items() %}
+{% if redis_security.rename_commands is defined and
+      redis_security.rename_commands | count > 0 %}
+  {% for command, renamed in redis_security.rename_commands.items() %}
     {% set _rename = '""' %}
     {% if rename is defined and
           rename | string | length > 0 %}

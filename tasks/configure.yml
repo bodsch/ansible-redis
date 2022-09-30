@@ -1,8 +1,8 @@
 ---
 
-- name: create logging directory {{ redis_general_logfile | dirname }}
+- name: create logging directory {{ redis_general.logfile | dirname }}
   file:
-    path: "{{ redis_general_logfile | dirname }}"
+    path: "{{ redis_general.logfile | dirname }}"
     state: directory
     owner: redis
     mode: 0755
@@ -42,4 +42,19 @@
   notify:
     - restart redis
 
+- name: create redis-sentinel configuration
+  template:
+    src: sentinel.conf.j2
+    dest: /etc/redis/sentinel.conf
+    mode: 0644
+  when:
+    - redis_sentinel.enabled is defined
+    - redis_sentinel.enabled
+    - redis_sentinel.master is defined
+    - redis_sentinel.master | string | length > 0
+    - redis_sentinel.master | ipaddr('address')
+  notify:
+    - restart redis-sentinel
+  tags:
+    - redis
 ...

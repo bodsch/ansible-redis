@@ -16,19 +16,22 @@
 # For example you may use one of the following:
 #
 # bind 127.0.0.1 192.168.1.1
-bind {{ redis_sentinel_network_bind | default('127.0.0.1') }}
+{% if redis_sentinel.bind is defined and
+      redis_sentinel.bind | count > 0 %}
+bind {{ redis_sentinel.bind | default(['127.0.0.1']) | join(' ') }}
+{% endif %}
 
-#
+
 # protected-mode no
 
 # port <sentinel-port>
 # The port that this sentinel instance will run on
-port 26379
+port {{ redis_sentinel.port }}
 
 # By default Redis Sentinel does not run as a daemon. Use 'yes' if you need it.
 # Note that Redis will write a pid file in /var/run/redis-sentinel.pid when
 # daemonized.
-daemonize yes
+daemonize {{ redis_sentinel.daemonize | bool | ternary('yes', 'no') }}
 
 # When running daemonized, Redis Sentinel writes a pid file in
 # /var/run/redis-sentinel.pid by default. You can specify a custom pid file
@@ -38,7 +41,7 @@ pidfile /var/run/sentinel/redis-sentinel.pid
 # Specify the log file name. Also the empty string can be used to force
 # Sentinel to log on the standard output. Note that if you use standard
 # output for logging but daemonize, logs will be sent to /dev/null
-logfile /var/log/redis/redis-sentinel.log
+logfile {{ redis_sentinel.logfile }}
 
 # sentinel announce-ip <ip>
 # sentinel announce-port <port>
@@ -61,14 +64,17 @@ logfile /var/log/redis/redis-sentinel.log
 # Example:
 #
 # sentinel announce-ip 1.2.3.4
-sentinel announce-ip {{ redis_sentinel_announce_ip }}
+sentinel announce-ip {{ redis_sentinel.announce_ip }}
 
 # dir <working-directory>
 # Every long running process should have a well-defined working directory.
 # For Redis Sentinel to chdir to /tmp at startup is the simplest thing
 # for the process to don't interfere with administrative tasks such as
 # unmounting filesystems.
-dir /var/lib/redis
+{% if redis_sentinel.dir is defined and
+      redis_sentinel.dir | string | length > 0 %}
+dir {{ redis_sentinel.dir }}
+{% endif %}
 
 # sentinel monitor <master-name> <ip> <redis-port> <quorum>
 #
@@ -87,7 +93,7 @@ dir /var/lib/redis
 #
 # Note: master name should not include special characters or spaces.
 # The valid charset is A-z 0-9 and the three characters ".-_".
-sentinel monitor {{ redis_sentinel_cluster_name }} {{ redis_sentinel_master }} 6379 2
+sentinel monitor {{ redis_sentinel.cluster_name }} {{ redis_sentinel.master }} 6379 2
 
 # sentinel auth-pass <master-name> <password>
 #
@@ -116,7 +122,7 @@ sentinel monitor {{ redis_sentinel_cluster_name }} {{ redis_sentinel_master }} 6
 # Down).
 #
 # Default is 30 seconds.
-sentinel down-after-milliseconds {{ redis_sentinel_cluster_name }} 2000
+sentinel down-after-milliseconds {{ redis_sentinel.cluster_name }} {{ redis_sentinel.down_after_milliseconds }}
 
 # sentinel parallel-syncs <master-name> <numreplicas>
 #
@@ -124,7 +130,7 @@ sentinel down-after-milliseconds {{ redis_sentinel_cluster_name }} 2000
 # during the failover. Use a low number if you use the replicas to serve query
 # to avoid that all the replicas will be unreachable at about the same
 # time while performing the synchronization with the master.
-sentinel parallel-syncs {{ redis_sentinel_cluster_name }} 1
+sentinel parallel-syncs {{ redis_sentinel.cluster_name }} {{ redis_sentinel.parallel_syncs }}
 
 # sentinel failover-timeout <master-name> <milliseconds>
 #
@@ -149,7 +155,7 @@ sentinel parallel-syncs {{ redis_sentinel_cluster_name }} 1
 #   the exact parallel-syncs progression as specified.
 #
 # Default is 3 minutes.
-sentinel failover-timeout {{ redis_sentinel_cluster_name }} 3000
+sentinel failover-timeout {{ redis_sentinel.cluster_name }} {{ redis_sentinel.failover_timeout }}
 
 # SCRIPTS EXECUTION
 #

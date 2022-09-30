@@ -1,9 +1,21 @@
 ---
 
-- name: ensure redis is running and enabled on boot.
+- name: ensure {{ redis_daemon }} is running and enabled on boot
   service:
     name: "{{ redis_daemon }}"
     state: started
     enabled: true
+
+- name: ensure redis-sentinel is running and enabled on boot
+  service:
+    name: redis-sentinel
+    enabled: "{{ redis_sentinel.enabled }}"
+    state: "{{ redis_sentinel.state }}"
+  when:
+    - redis_sentinel.enabled is defined
+    - redis_sentinel.enabled
+    - redis_sentinel.master is defined
+    - redis_sentinel.master | string | length > 0
+    - redis_sentinel.master | ipaddr('address')
 
 ...

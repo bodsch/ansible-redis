@@ -1,10 +1,12 @@
 ---
 
+redis_requirements:
+  - iproute2
+
 redis_packages:
   - redis-server
   - redis-sentinel
   - redis-tools
-  - iproute2
 
 redis_config_file: /etc/redis/redis.conf
 

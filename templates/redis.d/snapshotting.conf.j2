@@ -26,11 +26,14 @@
 # save 300 10
 # save 60 10000
 
-{% for save in redis_snapshot_save %}
+{% if redis_snapshot.save is defined and
+      redis_snapshot.save | count > 0 %}
+  {% for save in redis_snapshot.save %}
 save {{ save }}
-{% endfor %}
+  {% endfor %}
+{% endif %}
 
-
+{% if stop_writes_on_bgsave_error.rdbcompression is defined %}
 # By default Redis will stop accepting writes if RDB snapshots are enabled
 # (at least one save point) and the latest background save failed.
 # This will make the user aware (in a hard way) that data is not persisting
@@ -44,14 +47,18 @@ save {{ save }}
 # and persistence, you may want to disable this feature so that Redis will
 # continue to work as usual even if there are problems with disk,
 # permissions, and so forth.
-stop-writes-on-bgsave-error yes
+stop-writes-on-bgsave-error {{ stop_writes_on_bgsave_error.rdbcompression | default('true') | bool | ternary('yes', 'no')  }}
+{% endif %}
 
+{% if redis_snapshot.rdbcompression is defined %}
 # Compress string objects using LZF when dump .rdb databases?
 # For default that's set to 'yes' as it's almost always a win.
 # If you want to save some CPU in the saving child set it to 'no' but
 # the dataset will likely be bigger if you have compressible values or keys.
-rdbcompression {{ redis_snapshot_rdbcompression | bool | ternary('yes', 'no')  }}
+rdbcompression {{ redis_snapshot.rdbcompression | default('false') | bool | ternary('yes', 'no')  }}
+{%endif %}
 
+{% if redis_snapshot.rdbchecksum is defined %}
 # Since version 5 of RDB a CRC64 checksum is placed at the end of the file.
 # This makes the format more resistant to corruption but there is a performance
 # hit to pay (around 10%) when saving and loading RDB files, so you can disable it
@@ -59,11 +66,17 @@ rdbcompression {{ redis_snapshot_rdbcompression | bool | ternary('yes', 'no')  }
 #
 # RDB files created with checksum disabled have a checksum of zero that will
 # tell the loading code to skip the check.
-rdbchecksum yes
+rdbchecksum {{ redis_snapshot.rdbchecksum | default('true') | bool | ternary('yes', 'no')  }}
+{% endif %}
 
+{% if redis_snapshot.dbfilename is defined and
+      redis_snapshot.dbfilename | string | length > 0 %}
 # The filename where to dump the DB
-dbfilename {{ redis_snapshot_dbfilename }}
+dbfilename {{ redis_snapshot.dbfilename }}
+{% endif %}
 
+{% if redis_snapshot.dir is defined and
+      redis_snapshot.dir | string | length > 0 %}
 # The working directory.
 #
 # The DB will be written inside this directory, with the filename specified
@@ -73,4 +86,5 @@ dbfilename {{ redis_snapshot_dbfilename }}
 #
 # Note that you must specify a directory here, not a file name.
 # dir /var/lib/redis
-dir {{ redis_snapshot_dbdir }}
+dir {{ redis_snapshot.dir }}
+{% endif %}

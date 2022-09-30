@@ -1,10 +1,12 @@
 ---
 
+redis_requirements:
+  - iproute2
+
 redis_packages:
   - redis-server
   - redis-sentinel
   - redis-tools
-  - iproute2
 
 redis_config_file: /etc/redis/redis.conf
 
@@ -59,18 +61,43 @@ redis_defaults_replication:
 
 redis_defaults_security:
   requirepass: ""
-  rename_command: {}
+  rename_commands: {}
 
 redis_defaults_snapshot:
   save:
   - 900 1
   - 300 10
   - 60 10000
-  dbfilename: dump.rdb
+  stop_writes_on_bgsave_error: true
   rdbcompression: false
-  dbdir: /var/lib/redis
+  rdbchecksum: true
+  dbfilename: dump.rdb
+  dir: "{{ redis_data_dir }}"
 
-#redis_defaults_sentinel:
+# sentinel
+redis_defaults_sentinel:
+  enabled: false
+  state: started
+  bind:
+    - "127.0.0.1"
+  port: 26379
+  protected_mode: false
+  daemonize: true
+  logfile: /var/log/redis/redis-sentinel.log
+  cluster_name: redis_cluster
+  master: ''
+  announce_ip: ''
+  dir: "{{ redis_data_dir }}"
+  auth:
+    username: password
+  down_after_milliseconds: 300
+  parallel_syncs: 1
+  failover_timeout: 3000
+  notification_script: ""
+  client_reconfig_script: ""
+  deny_scripts_reconfig: true
+  rename_commands: {}
+
 
 # ------------------------------------------------------------------------------------------------
 

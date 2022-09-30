@@ -3,3 +3,13 @@
   service:
     name: "{{ redis_daemon }}"
     state: restarted
+
+- name: restart redis-sentinel
+  service:
+    name: redis-sentinel
+    state: restarted
+  when:
+    - redis_sentinel.enabled is defined
+    - redis_sentinel.enabled
+
+...
