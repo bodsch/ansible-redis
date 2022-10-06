@@ -1,11 +1,17 @@
 ---
 
-- name: ensure redis is installed.
+- name: ensure redis is installed
   package:
     name: "{{ redis_packages }}"
     state: present
+  tags:
+    - redis
+    - redis_install
 
 - name: get latest system information
   setup:
+  tags:
+    - redis
+    - redis_install
 
 ...

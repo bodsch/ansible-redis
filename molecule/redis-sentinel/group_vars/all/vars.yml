@@ -1,0 +1,15 @@
+---
+
+# helper variable
+redis_master_ip: "10.13.1.10"
+
+redis_network:
+  bind: "0.0.0.0"
+  port: 6379
+
+redis_replication:
+  master_ip: "{{ redis_master_ip }}"
+
+redis_limits_maxmemory: 512M
+
+...

@@ -17,10 +17,18 @@
         - "{{ ansible_os_family | lower | replace(' ', '') }}.yml"
         - default.yml
       skip: true
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 - name: update package cache
   package:
     update_cache: true
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 - name: install dependency
   package:
@@ -28,15 +36,26 @@
     state: present
   when:
     - redis_requirements | default([]) | count > 0
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 - name: re-read ansible facts
   setup:
+  tags:
+    - redis
+    - redis_prepare
 
 - name: create include directory {{ redis_include_path }}
   file:
     path: "{{ redis_include_path }}"
     state: directory
     mode: 0755
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 - name: merge redis configuration between defaults and custom
   set_fact:
@@ -48,5 +67,9 @@
     redis_security: "{{ redis_defaults_security | combine( redis_security, recursive=True) }}"
     redis_snapshot: "{{ redis_defaults_snapshot | combine( redis_snapshot, recursive=True) }}"
     redis_sentinel: "{{ redis_defaults_sentinel | combine( redis_sentinel, recursive=True) }}"
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 ...

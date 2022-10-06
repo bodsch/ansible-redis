@@ -1,0 +1,7 @@
+---
+
+- name: transparent-hugepage
+  src:
+  scm: git
+
+...

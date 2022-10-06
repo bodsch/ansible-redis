@@ -124,7 +124,9 @@ def test_directories(host, dirs):
 
 
 @pytest.mark.parametrize("files", [
-    "/etc/redis.d/general.conf"
+    "/etc/redis/redis.conf",
+    "/etc/redis.d/general.conf",
+    "/etc/redis.d/network.conf",
 ])
 def test_files(host, files):
     f = host.file(files)
@@ -154,8 +156,8 @@ def test_open_port(host, get_vars):
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    bind_address = get_vars.get("redis_network_bind", "127.0.0.1")
-    bind_port = get_vars.get("redis_network_port", "6379")
+    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
+    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
 
     print(f"address: {bind_address}")
     print(f"port   : {bind_port}")

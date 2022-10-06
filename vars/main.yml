@@ -78,11 +78,10 @@ redis_defaults_snapshot:
 redis_defaults_sentinel:
   enabled: false
   state: started
-  bind:
-    - "127.0.0.1"
+  bind: "127.0.0.1"
   port: 26379
   protected_mode: false
-  daemonize: true
+  daemonize: false
   logfile: /var/log/redis/redis-sentinel.log
   cluster_name: redis_cluster
   master: ''
