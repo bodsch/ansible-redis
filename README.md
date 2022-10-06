@@ -34,68 +34,92 @@ Tested on
 see [defaults/main.yml](defaults/main.yml)
 
 ```yaml
-
 redis_include_path: /etc/redis.d
+redis_data_dir: /var/lib/redis
 
 redis_includes:
   - active_defragmentation.conf
+  # - advanced_config.conf
+  # - append_only.conf
   - clients.conf
   - cluster_docker_nat.conf
   - event_notification.conf
   - general.conf
   - latency_monitor.conf
+  # - lazy_freeing.conf
   - lua_scripting.conf
   - memory_management.conf
   - network.conf
   - redis_cluster.conf
+  # - replication.conf
   - security.conf
   - slow_log.conf
   - snapshotting.conf
 
 # general
-redis_general_loglevel: notice
-redis_general_logfile: /var/log/redis/redis-server.log
-redis_general_databases: 16
-redis_general_show_logo: true
-redis_general_daemonize: true
-redis_general_supervised: auto
+redis_general:
+  loglevel: notice
+  logfile: /var/log/redis/redis-server.log
+  databases: 16
+  show_logo: true
+  daemonize: true
+  supervised: auto
 
 # append_only
-redis_append_only: false
-redis_append_filename: appendonly.aof
-redis_append_fsync: everysec
+redis_append:
+  only: false
+  filename: appendonly.aof
+  fsync: everysec
 
 # memory_management
-redis_memory_maxmemory: 0
-redis_memory_maxmemory_policy: "noeviction"
-redis_memory_maxmemory_samples: 5
+redis_memory:
+  maxmemory: 0
+  maxmemory_policy: noeviction
+  maxmemory_samples: 5
+  replica_ignore_maxmemory: true
 
 # network
-redis_network_port: 6379
-redis_network_bind: 127.0.0.1
-redis_network_unixsocket: ''
-redis_network_unixsocket_perm: 0700
-redis_network_timeout: 300
-redis_network_tcp_timeout: 300
+redis_network:
+  bind: 127.0.0.1
+  port: 6379
+  tcp_backlog: 511
+  unixsocket: ''
+  unixsocket_perm: 0700
+  timeout: 300
+  tcp_keepalive: 300
 
 # replication
-redis_replication_master_ip: ""
-redis_replication_master_port: 6379
+redis_replication:
+  master_ip: ""
+  master_port: 6379
 
 # security
-redis_security_requirepass: ""
-redis_security_disabled_command: []
+redis_security:
+  requirepass: ""
+  rename_commands: {}
 
 # snapshotting
-# Set to an empty set to disable persistence (saving the DB to disk).
-redis_snapshot_save:
-  - 900 1
-  - 300 10
-  - 60 10000
+redis_snapshot:
+  # Set to an empty set to disable persistence (saving the DB to disk).
+  save:
+    - 900 1
+    - 300 10
+    - 60 10000
+  dbfilename: dump.rdb
+  rdbcompression: false
+  dbdir: "{{ redis_data_dir }}"
 
-redis_snapshot_dbfilename: dump.rdb
-redis_snapshot_rdbcompression: false
-redis_snapshot_dbdir: /var/lib/redis
+redis_sentinel:
+  enabled: false
+  state: started
+  bind: "127.0.0.1"
+  port: 26379
+  protected_mode: false
+  daemonize: false
+  logfile: /var/log/redis/redis-sentinel.log
+  cluster_name: redis_cluster
+  master: ''
+  announce_ip: ''
 ```
 
 ---
