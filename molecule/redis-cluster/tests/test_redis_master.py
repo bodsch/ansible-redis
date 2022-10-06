@@ -26,7 +26,7 @@ def base_directory():
     """ ... """
     cwd = os.getcwd()
 
-    if('group_vars' in os.listdir(cwd)):
+    if ('group_vars' in os.listdir(cwd)):
         directory = "../.."
         molecule_directory = "."
     else:
@@ -113,17 +113,16 @@ def test_package(host, get_vars):
 
 
 def test_config_file(host, get_vars):
-    bind_address = get_vars.get("redis_network_bind")
-    master_ip = get_vars.get("redis_replication_master_ip")
+    """
+    """
+    bind_address = get_vars.get("redis_network").get("bind")
 
     bind_string = f"bind {bind_address}"
-    replica_of = f"replicaof {master_ip}"
 
-    config_file = host.file("/etc/redis.d/network.conf")
-    assert config_file.is_file
+    net_config_file = host.file("/etc/redis.d/network.conf")
+    assert net_config_file.is_file
 
-    assert bind_string in config_file.content_string
-    assert replica_of not in config_file.content_string
+    assert bind_string in net_config_file.content_string
 
 
 def test_service_running(host, get_vars):
@@ -137,14 +136,13 @@ def test_service_running(host, get_vars):
 
 
 def test_open_port(host, get_vars):
+    """
+    """
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    bind_address = get_vars.get("redis_network_bind", "127.0.0.1")
-    bind_port = get_vars.get("redis_network_port", "6379")
-
-    print(f"address: {bind_address}")
-    print(f"port   : {bind_port}")
+    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
+    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
 
     service = host.socket(f"tcp://{bind_address}:{bind_port}")
     assert service.is_listening

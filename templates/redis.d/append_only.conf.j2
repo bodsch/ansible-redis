@@ -1,4 +1,5 @@
-
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 ############################## APPEND ONLY MODE ###############################
 
 # By default Redis asynchronously dumps the dataset on disk. This mode is
@@ -20,11 +21,11 @@
 # Please check http://redis.io/topics/persistence for more information.
 
 # appendonly no
-appendonly {{ redis_append_only | bool | ternary('yes', 'no') }}
+appendonly {{ redis_append.only | bool | ternary('yes', 'no') }}
 
 # The name of the append only file (default: "appendonly.aof")
 
-appendfilename "{{ redis_append_filename }}"
+appendfilename "{{ redis_append.filename }}"
 
 # The fsync() call tells the Operating System to actually write data on disk
 # instead of waiting for more data in the output buffer. Some OS will really flush
@@ -52,7 +53,13 @@ appendfilename "{{ redis_append_filename }}"
 # appendfsync always
 # appendfsync everysec
 # appendfsync no
-appendfsync {{ redis_append_fsync }}
+{% set _append_fsync = "everysec" %}
+{% if redis_append.fsync is defined and
+      redis_append.fsync | string | length > 0 and
+      redis_append.fsync in ["always", "everysec", "no"] %}
+  {% set _append_fsync = redis_append.fsync %}
+{% endif %}
+appendfsync {{ _append_fsync }}
 
 
 # When the AOF fsync policy is set to always or everysec, and a background

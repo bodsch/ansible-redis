@@ -1,4 +1,5 @@
-
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 ################################## SECURITY ###################################
 
 # Require clients to issue AUTH <PASSWORD> before processing any other
@@ -14,8 +15,9 @@
 #
 # requirepass foobared
 
-{% if redis_security_requirepass %}
-requirepass {{ redis_security_requirepass }}
+{% if redis_security.requirepass is defined and
+      redis_security.requirepass | string | length > 0 %}
+requirepass {{ redis_security.requirepass }}
 {% endif %}
 
 # Command renaming.
@@ -37,6 +39,14 @@ requirepass {{ redis_security_requirepass }}
 # Please note that changing the name of commands that are logged into the
 # AOF file or transmitted to replicas may cause problems.
 
-{% for redis_disabled_command in redis_security_disabled_command %}
-rename-command {{ redis_disabled_command }} ""
-{% endfor %}
+{% if redis_security.rename_commands is defined and
+      redis_security.rename_commands | count > 0 %}
+  {% for command, renamed in redis_security.rename_commands.items() %}
+    {% set _rename = '""' %}
+    {% if rename is defined and
+          rename | string | length > 0 %}
+      {% set _rename = rename %}
+    {% endif %}
+rename-command {{ command }} {{ _rename }}
+  {% endfor %}
+{% endif %}

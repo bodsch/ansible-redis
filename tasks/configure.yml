@@ -1,11 +1,14 @@
 ---
 
-- name: create logging directory {{ redis_general_logfile | dirname }}
+- name: create logging directory {{ redis_general.logfile | dirname }}
   file:
-    path: "{{ redis_general_logfile | dirname }}"
+    path: "{{ redis_general.logfile | dirname }}"
     state: directory
     owner: redis
     mode: 0755
+  tags:
+    - redis
+    - redis_configure
 
 - name: create splitted redis configuration
   template:
@@ -32,6 +35,9 @@
     - snapshotting.conf
   notify:
     - restart redis
+  tags:
+    - redis
+    - redis_configure
 
 - name: write redis configuration
   template:
@@ -41,5 +47,26 @@
     backup: true
   notify:
     - restart redis
+  tags:
+    - redis
+    - redis_configure
 
+- name: create redis-sentinel configuration
+  template:
+    src: sentinel.conf.j2
+    dest: /etc/redis/sentinel.conf
+    mode: 0644
+    backup: true
+  when:
+    - redis_sentinel.enabled is defined
+    - redis_sentinel.enabled
+    - redis_sentinel.master is defined
+    - redis_sentinel.master | string | length > 0
+    - redis_sentinel.master | ipaddr('address')
+  notify:
+    - restart redis-sentinel
+  tags:
+    - redis
+    - redis_configure
+    - redis_sentinel
 ...

@@ -1,0 +1,55 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+
+{% if redis_sentinel.bind is defined and
+      redis_sentinel.bind | string | length > 0 %}
+bind {{ redis_sentinel.bind }}
+{% endif %}
+protected-mode {{ redis_sentinel.protected_mode | bool | ternary('yes', 'no') }}
+port {{ redis_sentinel.port }}
+daemonize {{ redis_sentinel.daemonize | bool | ternary('yes', 'no') }}
+pidfile "/var/run/sentinel/redis-sentinel.pid"
+logfile "{{ redis_sentinel.logfile }}"
+{% if redis_sentinel.announce_ip is defined and
+      redis_sentinel.announce_ip | string | length > 0 %}
+sentinel announce-ip "{{ redis_sentinel.announce_ip }}"
+{% endif %}
+{% if redis_sentinel.dir is defined and
+      redis_sentinel.dir | string | length > 0 %}
+dir "{{ redis_sentinel.dir }}"
+{% endif %}
+sentinel monitor {{ redis_sentinel.cluster_name }} {{ redis_sentinel.master }} 6379 2
+
+# sentinel auth-pass <master-name> <password>
+# Example:
+#
+# sentinel auth-pass mymaster MySUPER--secret-0123passw0rd
+sentinel down-after-milliseconds {{ redis_sentinel.cluster_name }} {{ redis_sentinel.down_after_milliseconds }}
+
+# sentinel parallel-syncs <master-name> <numreplicas>
+# sentinel parallel-syncs {{ redis_sentinel.cluster_name }} {{ redis_sentinel.parallel_syncs }}
+
+# sentinel failover-timeout <master-name> <milliseconds>
+sentinel failover-timeout {{ redis_sentinel.cluster_name }} {{ redis_sentinel.failover_timeout }}
+
+# SCRIPTS EXECUTION
+# NOTIFICATION SCRIPT
+#
+# sentinel notification-script <master-name> <script-path>
+# Example:
+#
+# sentinel notification-script mymaster /var/redis/notify.sh
+
+# CLIENTS RECONFIGURATION SCRIPT
+#
+# sentinel client-reconfig-script <master-name> <script-path>
+# Example:
+#
+# sentinel client-reconfig-script mymaster /var/redis/reconfig.sh
+
+# SECURITY
+sentinel deny-scripts-reconfig yes
+
+# REDIS COMMANDS RENAMING
+# SENTINEL rename-command mymaster CONFIG GUESSME
+# SENTINEL rename-command mymaster CONFIG CONFIG

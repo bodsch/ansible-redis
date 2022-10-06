@@ -1,0 +1,9 @@
+---
+
+redis_sentinel:
+  enabled: true
+  master: "{{ redis_master_ip }}"
+  bind: "10.13.1.3"
+  announce_ip: "10.13.1.3"
+
+...

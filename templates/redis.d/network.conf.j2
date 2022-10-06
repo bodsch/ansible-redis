@@ -1,4 +1,5 @@
-
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 ################################## NETWORK #####################################
 
 # By default, if no "bind" configuration directive is specified, Redis listens
@@ -22,7 +23,7 @@
 # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
 # JUST COMMENT THE FOLLOWING LINE.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bind {{ redis_network_bind }}
+bind {{ redis_network.bind }}
 
 # Protected mode is a layer of security protection, in order to avoid that
 # Redis instances left open on the internet are accessed and exploited.
@@ -45,7 +46,7 @@ protected-mode yes
 
 # Accept connections on the specified port, default is 6379 (IANA #815344).
 # If port 0 is specified Redis will not listen on a TCP socket.
-port {{ redis_network_port }}
+port {{ redis_network.port }}
 
 # TCP listen() backlog.
 #
@@ -54,7 +55,7 @@ port {{ redis_network_port }}
 # will silently truncate it to the value of /proc/sys/net/core/somaxconn so
 # make sure to raise both the value of somaxconn and tcp_max_syn_backlog
 # in order to get the desired effect.
-tcp-backlog {{ redis_network_tcp_backlog | default('511') }}
+tcp-backlog {{ redis_network.tcp_backlog | default('511') }}
 
 # Unix socket.
 #
@@ -64,14 +65,14 @@ tcp-backlog {{ redis_network_tcp_backlog | default('511') }}
 #
 # unixsocket /var/run/redis/redis-server.sock
 # unixsocketperm 700
-
-{% if redis_network_unixsocket %}
-unixsocket {{ redis_network_unixsocket }}
-unixsocketperm {{ redis_network_unixsocket_perm | default('700') }}
+{% if redis_network.unixsocket is defined and
+      redis_network.unixsocket | string | length > 0 %}
+unixsocket {{ redis_network.unixsocket }}
+unixsocketperm {{ redis_network.unixsocket_perm | default('700') }}
 {% endif %}
 
 # Close the connection after a client is idle for N seconds (0 to disable)
-timeout {{ redis_network_timeout }}
+timeout {{ redis_network.timeout }}
 
 # TCP keepalive.
 #
@@ -88,4 +89,4 @@ timeout {{ redis_network_timeout }}
 #
 # A reasonable value for this option is 300 seconds, which is the new
 # Redis default starting with Redis 3.2.1.
-tcp-keepalive {{ redis_network_tcp_timeout | default('300') }}
+tcp-keepalive {{ redis_network.tcp_keepalive | default('300') }}

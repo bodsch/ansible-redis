@@ -1,5 +1,6 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 # {{ ansible_managed }}
-
+{#
 # Note that in order to read the configuration file, Redis must be
 # started with the file path as first argument:
 #
@@ -34,10 +35,11 @@
 #
 # include /path/to/local.conf
 # include /path/to/other.conf
+#}
 {% for include in redis_includes %}
 include {{ redis_include_path }}/{{ include }}
 {% endfor %}
-
+{#
 ################################## MODULES #####################################
 
 # Load modules at startup. If the server is not able to load modules
@@ -45,3 +47,4 @@ include {{ redis_include_path }}/{{ include }}
 #
 # loadmodule /path/to/my_module.so
 # loadmodule /path/to/other_module.so
+#}

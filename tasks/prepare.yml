@@ -17,36 +17,59 @@
         - "{{ ansible_os_family | lower | replace(' ', '') }}.yml"
         - default.yml
       skip: true
-
-- block:
-    #
-    - name: import EPEL GPG key.
-      rpm_key:
-        key: https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        state: present
-
-    - name: install EPEL repository
-      yum_repository:
-        name: epel
-        state: present
-        description: Extra Packages for Enterprise Linux {{ ansible_distribution_major_version }} - $basearch
-        baseurl: http://download.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/$basearch
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        metalink: https://mirrors.fedoraproject.org/metalink?repo=epel-{{ ansible_distribution_major_version }}&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod: priority
-        gpgcheck: 1
-        enabled: 1
-  when:
-    - ansible_os_family | lower == 'redhat'
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 - name: update package cache
   package:
     update_cache: true
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
+
+- name: install dependency
+  package:
+    name: "{{ redis_requirements }}"
+    state: present
+  when:
+    - redis_requirements | default([]) | count > 0
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
+
+- name: re-read ansible facts
+  setup:
+  tags:
+    - redis
+    - redis_prepare
 
 - name: create include directory {{ redis_include_path }}
   file:
     path: "{{ redis_include_path }}"
     state: directory
     mode: 0755
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
+
+- name: merge redis configuration between defaults and custom
+  set_fact:
+    redis_general: "{{ redis_defaults_general | combine( redis_general, recursive=True) }}"
+    redis_append: "{{ redis_defaults_append | combine( redis_append, recursive=True) }}"
+    redis_memory: "{{ redis_defaults_memory | combine( redis_memory, recursive=True) }}"
+    redis_network: "{{ redis_defaults_network | combine( redis_network, recursive=True) }}"
+    redis_replication: "{{ redis_defaults_replication | combine( redis_replication, recursive=True) }}"
+    redis_security: "{{ redis_defaults_security | combine( redis_security, recursive=True) }}"
+    redis_snapshot: "{{ redis_defaults_snapshot | combine( redis_snapshot, recursive=True) }}"
+    redis_sentinel: "{{ redis_defaults_sentinel | combine( redis_sentinel, recursive=True) }}"
+  tags:
+    - redis
+    - redis_prepare
+    - redis_configue
 
 ...

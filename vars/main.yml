@@ -1,74 +1,103 @@
 ---
 
+redis_requirements:
+  - iproute2
+
 redis_packages:
   - redis-server
   - redis-sentinel
   - redis-tools
-  - iproute2
 
 redis_config_file: /etc/redis/redis.conf
 
 redis_daemon: redis-server
 
+redis_defaults_general:
+  loglevel: notice
+  logfile: /var/log/redis/redis-server.log
+  databases: 16
+  show_logo: true
+  daemonize: true
+  supervised: auto
+
+redis_defaults_append:
+  only: false
+  filename: appendonly.aof
+  fsync: everysec
+
+redis_defaults_memory:
+  maxmemory: 0
+  maxmemory_policy: noeviction
+  maxmemory_samples: 5
+  replica_ignore_maxmemory: true
+
+redis_defaults_network:
+  bind: 127.0.0.1
+  port: 6379
+  tcp_backlog: 511
+  unixsocket: ''
+  unixsocket_perm: 0700
+  timeout: 300
+  tcp_keepalive: 300
+
+redis_defaults_replication:
+  master_ip: ""
+  master_port: 6379
+  # masterauth: ""
+  # replica_serve_stale_data: true
+  # replica_read_only: yes
+  # repl_diskless_sync: no
+  # repl_diskless_sync_delay: 5
+  # repl_ping_replica_period: 10
+  # repl_timeout: 60
+  # repl_disable_tcp_nodelay: no
+  # repl_backlog_size: 1mb
+  # repl_backlog_ttl: 3600
+  # replica_priority: 100
+  # min_replicas_to_write: 3
+  # min_replicas_max_lag: 10
+  # replica_announce_ip: 5.5.5.5
+  # replica_announce_port: 1234
+
+redis_defaults_security:
+  requirepass: ""
+  rename_commands: {}
+
+redis_defaults_snapshot:
+  save:
+    - 900 1
+    - 300 10
+    - 60 10000
+  stop_writes_on_bgsave_error: true
+  rdbcompression: false
+  rdbchecksum: true
+  dbfilename: dump.rdb
+  dir: "{{ redis_data_dir }}"
+
+# sentinel
+redis_defaults_sentinel:
+  enabled: false
+  state: started
+  bind: "127.0.0.1"
+  port: 26379
+  protected_mode: false
+  daemonize: false
+  logfile: /var/log/redis/redis-sentinel.log
+  cluster_name: redis_cluster
+  master: ''
+  announce_ip: ''
+  dir: "{{ redis_data_dir }}"
+  auth:
+    username: password
+  down_after_milliseconds: 300
+  parallel_syncs: 1
+  failover_timeout: 3000
+  notification_script: ""
+  client_reconfig_script: ""
+  deny_scripts_reconfig: true
+  rename_commands: {}
+
+
+# ------------------------------------------------------------------------------------------------
+
 systemd_lib_directory: /lib/systemd/system
-
-# _redis_packages:
-#   default:
-#     - redis-server
-#   redhat:
-#     - redis
-#   archlinux:
-#     - redis
-#
-# redis_packages: "{{
-#           _redis_packages[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
-#   default(_redis_packages[ansible_os_family | lower] |
-#   default(_redis_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-#   default(_redis_packages[ansible_distribution | lower] |
-#   default(_redis_packages['default'])))) }}"
-
-# _redis_config_file:
-#   default: /etc/redis/redis.conf
-#   redhat: /etc/redis.conf
-#   archlinux: /etc/redis.conf
-#
-# redis_config_file: "{{
-#           _redis_config_file[ansible_os_family | lower] |
-#   default(_redis_config_file['default']) }}"
-#
-# _redis_daemon:
-#   default: redis-server
-#   redhat: redis
-#   archlinux: redis
-#
-# redis_daemon: "{{
-#           _redis_daemon[ansible_os_family | lower] |
-#   default(_redis_daemon['default']) }}"
-
-
-# _systemd_lib_directory:
-#   default: /lib/systemd/system
-#   debian: /lib/systemd/system
-#   redhat: /usr/lib/systemd/system
-#
-# systemd_lib_directory: "{{
-#           _systemd_lib_directory[ansible_os_family | lower] |
-#   default(_systemd_lib_directory['default']) }}"
-
-# # arch
-# __redis_package: redis
-# redis_daemon: redis
-# redis_conf_path: /etc/redis.conf
-#
-# # debian
-# __redis_package: redis-server
-# redis_daemon: redis-server
-# redis_conf_path: /etc/redis/redis.conf
-# redis_conf_mode: 0640
-#
-#
-# # redhat
-# __redis_package: redis
-# redis_daemon: redis
-# redis_conf_path: /etc/redis.conf
-# redis_conf_mode: 0644
