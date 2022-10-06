@@ -42,7 +42,7 @@ redis_security: {}
 
 # snapshotting
 redis_snapshot:
-# Set to an empty set to disable persistence (saving the DB to disk).
+  # Set to an empty set to disable persistence (saving the DB to disk).
   save:
     - 900 1
     - 300 10

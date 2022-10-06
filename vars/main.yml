@@ -65,9 +65,9 @@ redis_defaults_security:
 
 redis_defaults_snapshot:
   save:
-  - 900 1
-  - 300 10
-  - 60 10000
+    - 900 1
+    - 300 10
+    - 60 10000
   stop_writes_on_bgsave_error: true
   rdbcompression: false
   rdbchecksum: true

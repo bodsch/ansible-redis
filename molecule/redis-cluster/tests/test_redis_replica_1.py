@@ -26,7 +26,7 @@ def base_directory():
     """ ... """
     cwd = os.getcwd()
 
-    if('group_vars' in os.listdir(cwd)):
+    if ('group_vars' in os.listdir(cwd)):
         directory = "../.."
         molecule_directory = "."
     else:
@@ -116,7 +116,7 @@ def test_config_file(host, get_vars):
     """
     """
     bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
+    # bind_port = get_vars.get("redis_network", {}).get("port", "6379")
 
     master_ip = get_vars.get("redis_replication", {}).get("master_ip")
 

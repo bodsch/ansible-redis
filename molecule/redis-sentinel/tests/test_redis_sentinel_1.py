@@ -14,6 +14,7 @@ HOST = 'redis_sentinel_1'
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
 
+
 def base_directory():
     """
     """
@@ -116,6 +117,7 @@ def test_config_file(host, get_vars):
     assert bind_string in net_config_file.content_string
     assert port_string in net_config_file.content_string
 
+
 def test_sentinel_config_file(host, get_vars):
     """
     """
@@ -123,7 +125,7 @@ def test_sentinel_config_file(host, get_vars):
     bind_port = get_vars.get("redis_sentinel", {}).get("port", "26379")
     announce_ip = get_vars.get("redis_sentinel", {}).get("announce_ip", "127.0.0.1")
 
-    master_ip = get_vars.get("redis_replication", {}).get("master_ip")
+    # master_ip = get_vars.get("redis_replication", {}).get("master_ip")
 
     bind_string = f"bind {bind_address}"
     port_string = f"port {bind_port}"
