@@ -2,6 +2,8 @@
 
 redis_packages:
   - redis
+
+redis_requirements:
   - iproute
 
 redis_config_file: /etc/redis.conf
