@@ -9,7 +9,7 @@ import pprint
 pp = pprint.PrettyPrinter()
 
 
-HOST = 'redis_replica_1'
+HOST = 'all'
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
@@ -71,19 +71,22 @@ def get_vars(host):
     file_vars          = read_ansible_yaml(f"{base_dir}/vars/main", "role_vars")
     file_distibution   = read_ansible_yaml(f"{base_dir}/vars/{operation_system}", "role_distibution")
     file_molecule      = read_ansible_yaml(f"{molecule_dir}/group_vars/all/vars", "test_vars")
-    # file_host_molecule = read_ansible_yaml("{}/host_vars/{}/vars".format(base_dir, HOST), "host_vars")
+    file_group_molecule = read_ansible_yaml(f"{molecule_dir}/group_vars/{HOST}/vars", "group_vars")
+    file_host_molecule = read_ansible_yaml(f"{base_dir}/host_vars/{HOST}/vars", "host_vars")
 
     defaults_vars      = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars          = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
     distibution_vars   = host.ansible("include_vars", file_distibution).get("ansible_facts").get("role_distibution")
     molecule_vars      = host.ansible("include_vars", file_molecule).get("ansible_facts").get("test_vars")
-    # host_vars          = host.ansible("include_vars", file_host_molecule).get("ansible_facts").get("host_vars")
+    group_vars         = host.ansible("include_vars", file_group_molecule).get("ansible_facts").get("group_vars")
+    host_vars          = host.ansible("include_vars", file_host_molecule).get("ansible_facts").get("host_vars")
 
     ansible_vars = defaults_vars
     ansible_vars.update(vars_vars)
     ansible_vars.update(distibution_vars)
     ansible_vars.update(molecule_vars)
-    # ansible_vars.update(host_vars)
+    ansible_vars.update(group_vars)
+    ansible_vars.update(host_vars)
 
     templar = Templar(loader=DataLoader(), variables=ansible_vars)
     result = templar.template(ansible_vars, fail_on_undefined=False)
@@ -91,48 +94,48 @@ def get_vars(host):
     return result
 
 
-@pytest.mark.parametrize("packages", [
-    "redis-server",
-    "redis-sentinel",
-    "redis-tools"
+def test_package(host, get_vars):
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    print(f"distribution: {distribution}")
+    print(f"release     : {release}")
+
+    if not distribution == "artix":
+        packages = get_vars.get("redis_packages")
+
+        for pack in packages:
+            p = host.package(pack)
+            assert p.is_installed
+
+
+@pytest.mark.parametrize("dirs", [
+    "/etc/redis.d",
 ])
-def test_package(host, packages):
-    p = host.package(packages)
-    assert p.is_installed
+def test_directories(host, dirs):
+    d = host.file(dirs)
+    assert d.is_directory
+    assert d.exists
 
 
-def test_config_file(host, get_vars):
-    """
-    """
-    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
-    # bind_port = get_vars.get("redis_network", {}).get("port", "6379")
+def test_files(host, get_vars):
+    redis_files = [
+      "/etc/redis.d/general.conf",
+      "/etc/redis.d/network.conf",
+    ]
 
-    master_ip = get_vars.get("redis_replication", {}).get("master_ip")
+    redis_files.append(get_vars.get("redis_config_file"))
 
-    bind_string = f"bind {bind_address}"
-    replica_of = f"replicaof {master_ip}"
-
-    net_config_file = host.file("/etc/redis.d/network.conf")
-    rep_config_file = host.file("/etc/redis.d/replication.conf")
-
-    assert net_config_file.is_file
-    assert rep_config_file.is_file
-
-    assert bind_string in net_config_file.content_string
-    assert replica_of in rep_config_file.content_string
+    for files in redis_files:
+        f = host.file(files)
+        assert f.exists
+        assert f.is_file
 
 
-def test_service_running(host):
-    service = host.service("redis-server")
-    assert service.is_running
+def test_user(host):
+    assert host.group("redis").exists
+    assert host.user("redis").exists
+    assert "redis" in host.user("redis").groups
+    # assert host.user("redis").shell == "/sbin/nologin"
+    assert host.user("redis").home == "/var/lib/redis"
 
-
-def test_open_port(host, get_vars):
-    for i in host.socket.get_listening_sockets():
-        pp.pprint(i)
-
-    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
-
-    service = host.socket(f"tcp://{bind_address}:{bind_port}")
-    assert service.is_listening

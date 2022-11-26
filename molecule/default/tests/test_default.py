@@ -10,7 +10,7 @@ import os
 
 import testinfra.utils.ansible_runner
 
-HOST = 'instance'
+HOST = 'all'
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
@@ -123,15 +123,18 @@ def test_directories(host, dirs):
     assert d.exists
 
 
-@pytest.mark.parametrize("files", [
-    "/etc/redis/redis.conf",
-    "/etc/redis.d/general.conf",
-    "/etc/redis.d/network.conf",
-])
-def test_files(host, files):
-    f = host.file(files)
-    assert f.exists
-    assert f.is_file
+def test_files(host, get_vars):
+    redis_files = [
+      "/etc/redis.d/general.conf",
+      "/etc/redis.d/network.conf",
+    ]
+
+    redis_files.append(get_vars.get("redis_config_file"))
+
+    for files in redis_files:
+        f = host.file(files)
+        assert f.exists
+        assert f.is_file
 
 
 def test_user(host):

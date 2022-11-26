@@ -9,8 +9,10 @@ redis_packages:
   - redis-tools
 
 redis_config_file: /etc/redis/redis.conf
-
 redis_daemon: redis-server
+
+redis_sentinel_config_file: /etc/redis/sentinel.conf
+redis_sentinel_daemon: redis-sentinel
 
 redis_defaults_general:
   loglevel: notice

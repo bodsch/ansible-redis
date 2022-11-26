@@ -10,7 +10,6 @@ pp = pprint.PrettyPrinter()
 
 HOST = 'redis_sentinel_3'
 
-
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
 
@@ -91,17 +90,7 @@ def get_vars(host):
     return result
 
 
-@pytest.mark.parametrize("packages", [
-    "redis-server",
-    "redis-sentinel",
-    "redis-tools"
-])
-def test_package(host, packages):
-    p = host.package(packages)
-    assert p.is_installed
-
-
-def test_config_file(host, get_vars):
+def test_redis_config(host, get_vars):
     """
     """
     bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
@@ -118,20 +107,22 @@ def test_config_file(host, get_vars):
     assert port_string in net_config_file.content_string
 
 
-def test_sentinel_config_file(host, get_vars):
+def test_sentinel_config(host, get_vars):
     """
     """
     bind_address = get_vars.get("redis_sentinel", {}).get("bind", "0.0.0.0")
     bind_port = get_vars.get("redis_sentinel", {}).get("port", "26379")
     announce_ip = get_vars.get("redis_sentinel", {}).get("announce_ip", "127.0.0.1")
 
-    # master_ip = get_vars.get("redis_replication", {}).get("master_ip")
+    print(f"redis sentinel announce ip: {announce_ip}")
+
+    sentinel_conf_file = get_vars.get("redis_sentinel_config_file", "/etc/redis/sentinel.conf")
 
     bind_string = f"bind {bind_address}"
     port_string = f"port {bind_port}"
     announce_string = f"sentinel announce-ip \"{announce_ip}\""
 
-    config_file = host.file("/etc/redis/sentinel.conf")
+    config_file = host.file(sentinel_conf_file)
 
     assert config_file.is_file
 
@@ -140,13 +131,23 @@ def test_sentinel_config_file(host, get_vars):
     assert announce_string in config_file.content_string
 
 
-def test_running_redis_service(host):
-    service = host.service("redis-server")
+def test_service(host, get_vars):
+    service_name = get_vars.get("redis_daemon")
+
+    print(f"redis daemon: {service_name}")
+
+    service = host.service(service_name)
+    assert service.is_enabled
     assert service.is_running
 
 
-def test_running_sentinel_service(host):
-    service = host.service("redis-sentinel")
+def test_service(host, get_vars):
+    service_name = get_vars.get("redis_sentinel_daemon")
+
+    print(f"redis sentinel daemon: {service_name}")
+
+    service = host.service(service_name)
+    assert service.is_enabled
     assert service.is_running
 
 

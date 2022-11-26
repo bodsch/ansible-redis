@@ -7,8 +7,10 @@ redis_requirements:
   - iproute
 
 redis_config_file: /etc/redis.conf
-
 redis_daemon: redis
+
+redis_sentinel_config_file: /etc/redis-sentinel.conf
+redis_sentinel_daemon: redis-sentinel
 
 systemd_lib_directory: /usr/lib/systemd/system
 

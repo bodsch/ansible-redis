@@ -9,7 +9,7 @@ import pprint
 pp = pprint.PrettyPrinter()
 
 
-HOST = 'redis_primary'
+HOST = 'redis_replica'
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
@@ -71,22 +71,19 @@ def get_vars(host):
     file_vars          = read_ansible_yaml(f"{base_dir}/vars/main", "role_vars")
     file_distibution   = read_ansible_yaml(f"{base_dir}/vars/{operation_system}", "role_distibution")
     file_molecule      = read_ansible_yaml(f"{molecule_dir}/group_vars/all/vars", "test_vars")
-    file_group_molecule = read_ansible_yaml(f"{molecule_dir}/group_vars/{HOST}/vars", "group_vars")
-    file_host_molecule = read_ansible_yaml(f"{base_dir}/host_vars/{HOST}/vars", "host_vars")
+    # file_host_molecule = read_ansible_yaml("{}/host_vars/{}/vars".format(base_dir, HOST), "host_vars")
 
     defaults_vars      = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars          = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
     distibution_vars   = host.ansible("include_vars", file_distibution).get("ansible_facts").get("role_distibution")
     molecule_vars      = host.ansible("include_vars", file_molecule).get("ansible_facts").get("test_vars")
-    group_vars         = host.ansible("include_vars", file_group_molecule).get("ansible_facts").get("group_vars")
-    host_vars          = host.ansible("include_vars", file_host_molecule).get("ansible_facts").get("host_vars")
+    # host_vars          = host.ansible("include_vars", file_host_molecule).get("ansible_facts").get("host_vars")
 
     ansible_vars = defaults_vars
     ansible_vars.update(vars_vars)
     ansible_vars.update(distibution_vars)
     ansible_vars.update(molecule_vars)
-    ansible_vars.update(group_vars)
-    ansible_vars.update(host_vars)
+    # ansible_vars.update(host_vars)
 
     templar = Templar(loader=DataLoader(), variables=ansible_vars)
     result = templar.template(ansible_vars, fail_on_undefined=False)
@@ -97,14 +94,20 @@ def get_vars(host):
 def test_config_file(host, get_vars):
     """
     """
-    bind_address = get_vars.get("redis_network").get("bind")
+    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
+
+    master_ip = get_vars.get("redis_replication", {}).get("master_ip")
 
     bind_string = f"bind {bind_address}"
+    replica_of = f"replicaof {master_ip}"
 
-    net_config_file = host.file("/etc/redis.d/network.conf")
-    assert net_config_file.is_file
+    network_config_file = host.file("/etc/redis.d/network.conf")
+    replication_config_file = host.file("/etc/redis.d/replication.conf")
+    assert network_config_file.is_file
+    assert replication_config_file.is_file
 
-    assert bind_string in net_config_file.content_string
+    assert bind_string in network_config_file.content_string
+    assert replica_of in replication_config_file.content_string
 
 
 def test_service_running(host, get_vars):

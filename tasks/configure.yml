@@ -54,7 +54,7 @@
 - name: create redis-sentinel configuration
   template:
     src: sentinel.conf.j2
-    dest: /etc/redis/sentinel.conf
+    dest: "{{ redis_sentinel_config_file }}"
     mode: 0644
     backup: true
   when:

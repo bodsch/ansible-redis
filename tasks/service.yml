@@ -11,7 +11,7 @@
 
 - name: ensure redis-sentinel is running and enabled on boot
   service:
-    name: redis-sentinel
+    name: "{{ redis_sentinel_daemon }}"
     enabled: "{{ redis_sentinel.enabled }}"
     state: "{{ redis_sentinel.state }}"
   when:
