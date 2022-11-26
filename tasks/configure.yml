@@ -4,7 +4,7 @@
   file:
     path: "{{ redis_general.logfile | dirname }}"
     state: directory
-    owner: redis
+    group: redis
     mode: 0755
   tags:
     - redis
@@ -15,6 +15,7 @@
     src: redis.d/{{ item }}.j2
     dest: /etc/redis.d/{{ item }}
     mode: 0644
+    group: redis
   loop:
     - active_defragmentation.conf
     - advanced_config.conf
@@ -44,6 +45,7 @@
     src: redis.conf.j2
     dest: "{{ redis_config_file }}"
     mode: 0644
+    group: redis
     backup: true
   notify:
     - restart redis
@@ -51,22 +53,33 @@
     - redis
     - redis_configure
 
-- name: create redis-sentinel configuration
-  template:
-    src: sentinel.conf.j2
-    dest: "{{ redis_sentinel_config_file }}"
-    mode: 0644
-    backup: true
+
+- name: sentinel support
   when:
     - redis_sentinel.enabled is defined
     - redis_sentinel.enabled
     - redis_sentinel.master is defined
     - redis_sentinel.master | string | length > 0
     - redis_sentinel.master | ipaddr('address')
-  notify:
-    - restart redis-sentinel
   tags:
     - redis
     - redis_configure
     - redis_sentinel
+  block:
+    - name: fix config directory rights
+      file:
+        path: "{{ redis_sentinel_config_file | dirname }}"
+        group: redis
+        mode: 0775
+
+    - name: create redis-sentinel configuration
+      template:
+        src: sentinel.conf.j2
+        dest: "{{ redis_sentinel_config_file }}"
+        mode: 0664
+        group: redis
+        backup: true
+      notify:
+        - restart redis-sentinel
+
 ...
