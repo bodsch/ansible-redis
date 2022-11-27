@@ -7,23 +7,18 @@ galaxy_info:
   author: Bodo Schulz
   description: ansible role to install redis
 
-  license: BSD
-  min_ansible_version: 2.9
+  license: Apache
+  min_ansible_version: "2.10"
 
   platforms:
     - name: ArchLinux
     - name: Debian
       versions:
-        # 10
-        - buster
         - bullseye
     - name: Ubuntu
       versions:
         # 20.04
         - focal
-    - name: EL
-      versions:
-        - 8
 
   galaxy_tags:
     - redis
