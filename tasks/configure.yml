@@ -5,7 +5,7 @@
     path: "{{ redis_general.logfile | dirname }}"
     state: directory
     group: redis
-    mode: 0755
+    mode: 0775
   tags:
     - redis
     - redis_configure

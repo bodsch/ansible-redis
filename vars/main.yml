@@ -99,7 +99,6 @@ redis_defaults_sentinel:
   deny_scripts_reconfig: true
   rename_commands: {}
 
-
 # ------------------------------------------------------------------------------------------------
 
 systemd_lib_directory: /lib/systemd/system
