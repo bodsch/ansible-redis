@@ -120,8 +120,8 @@ def test_directories(host, dirs):
 
 def test_files(host, get_vars):
     redis_files = [
-      "/etc/redis.d/general.conf",
-      "/etc/redis.d/network.conf",
+        "/etc/redis.d/general.conf",
+        "/etc/redis.d/network.conf",
     ]
 
     redis_files.append(get_vars.get("redis_config_file"))
@@ -138,4 +138,3 @@ def test_user(host):
     assert "redis" in host.user("redis").groups
     # assert host.user("redis").shell == "/sbin/nologin"
     assert host.user("redis").home == "/var/lib/redis"
-

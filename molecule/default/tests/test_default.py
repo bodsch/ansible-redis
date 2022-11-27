@@ -125,8 +125,8 @@ def test_directories(host, dirs):
 
 def test_files(host, get_vars):
     redis_files = [
-      "/etc/redis.d/general.conf",
-      "/etc/redis.d/network.conf",
+        "/etc/redis.d/general.conf",
+        "/etc/redis.d/network.conf",
     ]
 
     redis_files.append(get_vars.get("redis_config_file"))

@@ -141,7 +141,7 @@ def test_service(host, get_vars):
     assert service.is_running
 
 
-def test_service(host, get_vars):
+def test_sentinel_service(host, get_vars):
     service_name = get_vars.get("redis_sentinel_daemon")
 
     print(f"redis sentinel daemon: {service_name}")
