@@ -1,11 +1,12 @@
 ---
+
 - name: restart redis
-  service:
+  ansible.builtin.service:
     name: "{{ redis_daemon }}"
     state: restarted
 
 - name: restart redis-sentinel
-  service:
+  ansible.builtin.service:
     name: "{{ redis_sentinel_daemon }}"
     state: restarted
   when:

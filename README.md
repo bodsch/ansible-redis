@@ -1,16 +1,17 @@
 
 # Ansible Role:  `redis`
 
-Install and configure a redis server, or redis-cluster.
+Install and configure a *redis server*, or *redis cluster* including a *redis sentinel*.
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-redis/CI)][ci]
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-redis/main.yml?branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-redis)][issues]
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-redis)][releases]
+[![Ansible Quality Score](https://img.shields.io/ansible/quality/50067?label=role%20quality)][quality]
 
 [ci]: https://github.com/bodsch/ansible-redis/actions
 [issues]: https://github.com/bodsch/ansible-redis/issues?q=is%3Aopen+is%3Aissue
 [releases]: https://github.com/bodsch/ansible-redis/releases
-
+[quality]: https://galaxy.ansible.com/bodsch/redis
 
 ## tested operating systems
 

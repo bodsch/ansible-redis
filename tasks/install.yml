@@ -1,7 +1,7 @@
 ---
 
 - name: ensure redis is installed
-  package:
+  ansible.builtin.package:
     name: "{{ redis_packages }}"
     state: present
   tags:
@@ -9,7 +9,7 @@
     - redis_install
 
 - name: get latest system information
-  setup:
+  ansible.builtin.setup:
   tags:
     - redis
     - redis_install

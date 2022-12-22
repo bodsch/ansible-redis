@@ -1,7 +1,7 @@
 ---
 
 - name: include OS specific configuration ({{ ansible_distribution }} ({{ ansible_os_family }}) {{ ansible_distribution_major_version }})
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       paths:
@@ -23,7 +23,7 @@
     - redis_configue
 
 - name: update package cache
-  package:
+  ansible.builtin.package:
     update_cache: true
   tags:
     - redis
@@ -31,7 +31,7 @@
     - redis_configue
 
 - name: install dependency
-  package:
+  ansible.builtin.package:
     name: "{{ redis_requirements }}"
     state: present
   when:
@@ -42,13 +42,13 @@
     - redis_configue
 
 - name: re-read ansible facts
-  setup:
+  ansible.builtin.setup:
   tags:
     - redis
     - redis_prepare
 
 - name: create include directory {{ redis_include_path }}
-  file:
+  ansible.builtin.file:
     path: "{{ redis_include_path }}"
     state: directory
     mode: 0755
@@ -58,15 +58,15 @@
     - redis_configue
 
 - name: merge redis configuration between defaults and custom
-  set_fact:
-    redis_general: "{{ redis_defaults_general | combine( redis_general, recursive=True) }}"
-    redis_append: "{{ redis_defaults_append | combine( redis_append, recursive=True) }}"
-    redis_memory: "{{ redis_defaults_memory | combine( redis_memory, recursive=True) }}"
-    redis_network: "{{ redis_defaults_network | combine( redis_network, recursive=True) }}"
-    redis_replication: "{{ redis_defaults_replication | combine( redis_replication, recursive=True) }}"
-    redis_security: "{{ redis_defaults_security | combine( redis_security, recursive=True) }}"
-    redis_snapshot: "{{ redis_defaults_snapshot | combine( redis_snapshot, recursive=True) }}"
-    redis_sentinel: "{{ redis_defaults_sentinel | combine( redis_sentinel, recursive=True) }}"
+  ansible.builtin.set_fact:
+    redis_general: "{{ redis_defaults_general | combine(redis_general, recursive=True) }}"
+    redis_append: "{{ redis_defaults_append | combine(redis_append, recursive=True) }}"
+    redis_memory: "{{ redis_defaults_memory | combine(redis_memory, recursive=True) }}"
+    redis_network: "{{ redis_defaults_network | combine(redis_network, recursive=True) }}"
+    redis_replication: "{{ redis_defaults_replication | combine(redis_replication, recursive=True) }}"
+    redis_security: "{{ redis_defaults_security | combine(redis_security, recursive=True) }}"
+    redis_snapshot: "{{ redis_defaults_snapshot | combine(redis_snapshot, recursive=True) }}"
+    redis_sentinel: "{{ redis_defaults_sentinel | combine(redis_sentinel, recursive=True) }}"
   tags:
     - redis
     - redis_prepare

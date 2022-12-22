@@ -1,7 +1,7 @@
 ---
 
 - name: ensure {{ redis_daemon }} is running and enabled on boot
-  service:
+  ansible.builtin.service:
     name: "{{ redis_daemon }}"
     state: started
     enabled: true
@@ -10,7 +10,7 @@
     - redis_service
 
 - name: ensure redis-sentinel is running and enabled on boot
-  service:
+  ansible.builtin.service:
     name: "{{ redis_sentinel_daemon }}"
     enabled: "{{ redis_sentinel.enabled }}"
     state: "{{ redis_sentinel.state }}"
