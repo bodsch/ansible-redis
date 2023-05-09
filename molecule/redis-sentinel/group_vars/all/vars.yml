@@ -1,5 +1,10 @@
 ---
 
+redis_general:
+  loglevel: debug
+  databases: 3
+  show_logo: false
+
 # helper variable
 redis_master_ip: "10.13.1.10"
 

@@ -19,7 +19,7 @@
     - redis_sentinel.enabled
     - redis_sentinel.master is defined
     - redis_sentinel.master | string | length > 0
-    - redis_sentinel.master | ipaddr('address')
+    - redis_sentinel.master | ansible.utils.ipaddr('address')
   tags:
     - redis
     - redis_service

@@ -5,9 +5,9 @@
       redis_sentinel.bind | string | length > 0 %}
 bind {{ redis_sentinel.bind }}
 {% endif %}
-protected-mode {{ redis_sentinel.protected_mode | bool | ternary('yes', 'no') }}
+protected-mode {{ redis_sentinel.protected_mode | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 port {{ redis_sentinel.port }}
-daemonize {{ redis_sentinel.daemonize | bool | ternary('yes', 'no') }}
+daemonize {{ redis_sentinel.daemonize | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 pidfile "/var/run/sentinel/redis-sentinel.pid"
 logfile "{{ redis_sentinel.logfile }}"
 {% if redis_sentinel.announce_ip is defined and

@@ -15,55 +15,113 @@ redis_sentinel_config_file: /etc/redis/sentinel.conf
 redis_sentinel_daemon: redis-sentinel
 
 redis_defaults_general:
+  # debug (a lot of information, useful for development/testing)
+  # verbose (many rarely useful info, but not a mess like the debug level)
+  # notice (moderately verbose, what you want in production probably)
+  # warning (only very important / critical messages are logged)
   loglevel: notice
   logfile: /var/log/redis/redis-server.log
   databases: 16
   show_logo: true
   daemonize: true
+  #   supervised no      - no supervision interaction
+  #   supervised upstart - signal upstart by putting Redis into SIGSTOP mode
+  #   supervised systemd - signal systemd by writing READY=1 to $NOTIFY_SOCKET
+  #   supervised auto    - detect upstart or systemd method based on
+  #                        UPSTART_JOB or NOTIFY_SOCKET environment variables
   supervised: auto
+  syslog:
+    enabled: false
+    ident: redis
+    facility: local0
 
 redis_defaults_append:
   only: false
   filename: appendonly.aof
+  # no: don't fsync, just let the OS flush the data when it wants. Faster.
+  # always: fsync after every write to the append only log. Slow, Safest.
+  # everysec: fsync only one time every second. Compromise.
   fsync: everysec
+  no_appendfsync_on_rewrite: false
+  auto_aof_rewrite_percentage: 100
+  auto_aof_rewrite_min_size: 64mb
+  aof_load_truncated: true
+  aof_use_rdb_preamble: true
+
+redis_defaults_latency:
+  monitor_threshold: 0
+
+redis_defaults_lazy:
+  lazyfree_lazy_eviction: false
+  lazyfree_lazy_expire: false
+  lazyfree_lazy_server_del: false
+  replica_lazy_flush: false
+
+redis_defaults_lua:
+  lua_time_limit: 5000
 
 redis_defaults_memory:
   maxmemory: 0
+  # volatile-lru -> Evict using approximated LRU among the keys with an expire set.
+  # allkeys-lru -> Evict any key using approximated LRU.
+  # volatile-lfu -> Evict using approximated LFU among the keys with an expire set.
+  # allkeys-lfu -> Evict any key using approximated LFU.
+  # volatile-random -> Remove a random key among the ones with an expire set.
+  # allkeys-random -> Remove a random key, any key.
+  # volatile-ttl -> Remove the key with the nearest expire time (minor TTL)
+  # noeviction -> Don't evict anything, just return an error on write operations.
+  # LRU means Least Recently Used
+  # LFU means Least Frequently Used
   maxmemory_policy: noeviction
   maxmemory_samples: 5
   replica_ignore_maxmemory: true
 
 redis_defaults_network:
-  bind: 127.0.0.1
+  bind:
+    - 127.0.0.1
   port: 6379
-  tcp_backlog: 511
-  unixsocket: ''
-  unixsocket_perm: 0700
-  timeout: 300
-  tcp_keepalive: 300
+  protected_mode: true
+  tcp_backlog: "" # 511
+  unixsocket: "" #
+  unixsocket_perm: 700
+  timeout: "" # 1000
+  tcp_keepalive: "" # 300
+
+redis_defaults_cluster:
+  enabled: false
+  config_file: "" # nodes_6379.conf
+  node_timeout: "" # 15000
+  replica_validity_factor: "" # 10
+  migration_barrier: "" # 1
+  require_full_coverage: "" # true
+  replica_no_failover: "" # false
 
 redis_defaults_replication:
   master_ip: ""
-  master_port: 6379
-  # masterauth: ""
-  # replica_serve_stale_data: true
-  # replica_read_only: yes
-  # repl_diskless_sync: no
-  # repl_diskless_sync_delay: 5
-  # repl_ping_replica_period: 10
-  # repl_timeout: 60
-  # repl_disable_tcp_nodelay: no
-  # repl_backlog_size: 1mb
-  # repl_backlog_ttl: 3600
-  # replica_priority: 100
-  # min_replicas_to_write: 3
-  # min_replicas_max_lag: 10
-  # replica_announce_ip: 5.5.5.5
-  # replica_announce_port: 1234
+  master_port: "" # 6379
+  masterauth: ""
+  replica_serve_stale_data: "" # true
+  replica_read_only: "" # true
+  diskless_sync: "" # false
+  diskless_sync_delay: "" # 5
+  ping_replica_period: "" # 10
+  timeout: "" # 60
+  disable_tcp_nodelay: "" # false
+  backlog_size: "" # 1
+  backlog_ttl: "" # 3600
+  replica_priority: "" # 100
+  min_replicas_to_write: "" # 3
+  min_replicas_max_lag: "" # 10
+  replica_announce_ip: "" # 5.5.5.5
+  replica_announce_port: "" # 1234
 
 redis_defaults_security:
   requirepass: ""
   rename_commands: {}
+
+redis_defaults_slowlog:
+  slower_than: 10000
+  max_len: 128
 
 redis_defaults_snapshot:
   save:
@@ -93,7 +151,7 @@ redis_defaults_sentinel:
     username: password
   down_after_milliseconds: 300
   parallel_syncs: 1
-  failover_timeout: 3000
+  failover_timeout: 1000
   notification_script: ""
   client_reconfig_script: ""
   deny_scripts_reconfig: true

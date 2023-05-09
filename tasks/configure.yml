@@ -10,35 +10,35 @@
     - redis
     - redis_configure
 
-- name: create splitted redis configuration
-  ansible.builtin.template:
-    src: redis.d/{{ item }}.j2
-    dest: /etc/redis.d/{{ item }}
-    mode: 0644
-    group: redis
-  loop:
-    - active_defragmentation.conf
-    - advanced_config.conf
-    - append_only.conf
-    - clients.conf
-    - cluster_docker_nat.conf
-    - event_notification.conf
-    - general.conf
-    - latency_monitor.conf
-    - lazy_freeing.conf
-    - lua_scripting.conf
-    - memory_management.conf
-    - network.conf
-    - redis_cluster.conf
-    - replication.conf
-    - security.conf
-    - slow_log.conf
-    - snapshotting.conf
-  notify:
-    - restart redis
-  tags:
-    - redis
-    - redis_configure
+# - name: create splitted redis configuration
+#   ansible.builtin.template:
+#     src: redis.d/{{ item }}.j2
+#     dest: /etc/redis.d/{{ item }}
+#     mode: 0644
+#     group: redis
+#   loop:
+#     - active_defragmentation.conf
+#     - advanced_config.conf
+#     - append_only.conf
+#     - clients.conf
+#     - cluster_docker_nat.conf
+#     - event_notification.conf
+#     - general.conf
+#     - latency_monitor.conf
+#     - lazy_freeing.conf
+#     - lua_scripting.conf
+#     - memory_management.conf
+#     - network.conf
+#     - redis_cluster.conf
+#     - replication.conf
+#     - security.conf
+#     - slow_log.conf
+#     - snapshotting.conf
+#   notify:
+#     - restart redis
+#   tags:
+#     - redis
+#     - redis_configure
 
 - name: write redis configuration
   ansible.builtin.template:

@@ -61,10 +61,17 @@
   ansible.builtin.set_fact:
     redis_general: "{{ redis_defaults_general | combine(redis_general, recursive=True) }}"
     redis_append: "{{ redis_defaults_append | combine(redis_append, recursive=True) }}"
+    redis_cluster: "{{ redis_defaults_cluster | combine(redis_cluster, recursive=True) }}"
     redis_memory: "{{ redis_defaults_memory | combine(redis_memory, recursive=True) }}"
     redis_network: "{{ redis_defaults_network | combine(redis_network, recursive=True) }}"
+    redis_lazy: "{{ redis_defaults_lazy | combine(redis_lazy, recursive=True) }}"
+    redis_lua: "{{ redis_defaults_lua | combine(redis_lua, recursive=True) }}"
+    redis_latency: "{{ redis_defaults_latency | combine(redis_latency, recursive=True) }}"
+
+
     redis_replication: "{{ redis_defaults_replication | combine(redis_replication, recursive=True) }}"
     redis_security: "{{ redis_defaults_security | combine(redis_security, recursive=True) }}"
+    redis_slowlog: "{{ redis_defaults_slowlog | combine(redis_slowlog, recursive=True) }}"
     redis_snapshot: "{{ redis_defaults_snapshot | combine(redis_snapshot, recursive=True) }}"
     redis_sentinel: "{{ redis_defaults_sentinel | combine(redis_sentinel, recursive=True) }}"
   tags:

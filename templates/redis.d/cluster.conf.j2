@@ -1,0 +1,39 @@
+################################ REDIS CLUSTER  ###############################
+
+{% if redis_cluster is defined and
+      redis_cluster | count > 0 and
+      redis_cluster.enabled is defined and
+      redis_cluster.enabled | string | length > 0 and
+      redis_cluster.enabled | bool %}
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# WARNING EXPERIMENTAL: Redis Cluster is considered to be stable code, however
+# in order to mark it as "mature" we need to wait for a non trivial percentage
+# of users to deploy it in production.
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+cluster-enabled {{ redis_cluster.enabled | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% if redis_cluster.config_file is defined and
+        redis_cluster.config_file | string | length > 0 %}
+cluster-config-file {{ redis_cluster.config_file }}
+  {% endif %}
+  {% if redis_cluster.node_timeout is defined and
+        redis_cluster.node_timeout | string | length > 0 %}
+cluster-node-timeout {{ redis_cluster.node_timeout }}
+  {% endif %}
+  {% if redis_cluster.replica_validity_factor is defined and
+        redis_cluster.replica_validity_factor | string | length > 0 %}
+cluster-replica-validity-factor {{ redis_cluster.replica_validity_factor }}
+  {% endif %}
+  {% if redis_cluster.migration_barrier is defined and
+        redis_cluster.migration_barrier | string | length > 0 %}
+cluster-migration-barrier {{ redis_cluster.migration_barrier }}
+  {% endif %}
+  {% if redis_cluster.require_full_coverage is defined and
+        redis_cluster.require_full_coverage | string | length > 0 %}
+cluster-require-full-coverage {{ redis_cluster.require_full_coverage | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% endif %}
+  {% if redis_cluster.replica_no_failover is defined and
+        redis_cluster.replica_no_failover | string | length > 0 %}
+cluster-replica-no-failover {{ redis_cluster.replica_no_failover | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% endif %}
+{% endif %}

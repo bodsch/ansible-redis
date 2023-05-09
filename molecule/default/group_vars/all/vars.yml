@@ -1,5 +1,29 @@
 ---
 
+redis_includes:
+  #- active_defragmentation.conf
+  # - advanced_config.conf
+  - append_only.conf
+  #- clients.conf
+  #- cluster_docker_nat.conf
+  #- event_notification.conf
+  - general.conf
+  #- latency_monitor.conf
+  #- lazy_freeing.conf
+  #- lua_scripting.conf
+  #- memory.conf
+  - network.conf
+  #- cluster.conf
+  #- replication.conf
+  #- security.conf
+  #- slow_log.conf
+  #- snapshotting.conf
+
+redis_network:
+  bind:
+    - 127.0.0.1
+    - "{{ ansible_default_ipv4.address }}"
+
 redis_general_loglevel: verbose
 
 redis_security:

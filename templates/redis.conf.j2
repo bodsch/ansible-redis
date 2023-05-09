@@ -36,8 +36,11 @@
 # include /path/to/local.conf
 # include /path/to/other.conf
 #}
+
 {% for include in redis_includes %}
-include {{ redis_include_path }}/{{ include }}
+{% include('redis.d/' + include + '.j2' ) %}
+
+{# include {{ redis_include_path }}/{{ include }} #}
 {% endfor %}
 {#
 ################################## MODULES #####################################

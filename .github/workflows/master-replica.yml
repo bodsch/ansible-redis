@@ -2,16 +2,10 @@
 name: master-replica
 
 on:
-  schedule:
-    - cron: "10 2 * * 0"
   workflow_dispatch:
   workflow_run:
     workflows:
-      - "code linter"
-    branches:
-      - main
-      - feature/*
-      - fix/*
+      - "CI"
     types:
       - completed
 
@@ -31,8 +25,9 @@ jobs:
         image:
           - archlinux:latest
         ansible-version:
-          - '5.1'
           - '6.1'
+        scenario:
+          - redis-cluster
 
     steps:
       - name: check out the codebase.
@@ -52,8 +47,11 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name redis-cluster
+          make \
+            test \
+            -e TOX_SCENARIO="${{ matrix.scenario }}" \
+            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+            -e DISTRIBUTION="${{ matrix.image }}"
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -70,8 +68,9 @@ jobs:
           - debian:11
           - ubuntu:20.04
         ansible-version:
-          - '5.1'
           - '6.1'
+        scenario:
+          - redis-cluster
 
     steps:
       - name: check out the codebase.
@@ -91,8 +90,11 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name redis-cluster
+          make \
+            test \
+            -e TOX_SCENARIO="${{ matrix.scenario }}" \
+            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+            -e DISTRIBUTION="${{ matrix.image }}"
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

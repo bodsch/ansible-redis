@@ -14,7 +14,7 @@ redis_includes:
   - latency_monitor.conf
   # - lazy_freeing.conf
   - lua_scripting.conf
-  - memory_management.conf
+  - memory.conf
   - network.conf
   - redis_cluster.conf
   # - replication.conf
@@ -28,8 +28,15 @@ redis_general: {}
 # append_only
 redis_append: {}
 
+# cluster
+redis_cluster: {}
+
 # memory_management
 redis_memory: {}
+
+redis_lazy: {}
+redis_lua: {}
+redis_latency: {}
 
 # network
 redis_network: {}
@@ -39,6 +46,9 @@ redis_replication: {}
 
 # security
 redis_security: {}
+
+# slowlog
+redis_slowlog: {}
 
 # snapshotting
 redis_snapshot:

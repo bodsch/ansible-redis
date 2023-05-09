@@ -1,68 +1,48 @@
-#jinja2: trim_blocks: True, lstrip_blocks: True
-# {{ ansible_managed }}
 ################################# GENERAL #####################################
 
-# By default Redis does not run as a daemon. Use 'yes' if you need it.
-# Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
-daemonize {{ redis_general.daemonize | bool | ternary('yes', 'no') }}
-
-# If you run Redis from upstart or systemd, Redis can interact with your
-# supervision tree. Options:
-#   supervised no      - no supervision interaction
-#   supervised upstart - signal upstart by putting Redis into SIGSTOP mode
-#   supervised systemd - signal systemd by writing READY=1 to $NOTIFY_SOCKET
-#   supervised auto    - detect upstart or systemd method based on
-#                        UPSTART_JOB or NOTIFY_SOCKET environment variables
-# Note: these supervision methods only signal "process is ready."
-#       They do not enable continuous liveness pings back to your supervisor.
-supervised {{ redis_general.supervised }}
-
-# If a pid file is specified, Redis writes it where specified at startup
-# and removes it at exit.
-#
-# When the server runs non daemonized, no pid file is created if none is
-# specified in the configuration. When the server is daemonized, the pid file
-# is used even if not specified, defaulting to "/var/run/redis.pid".
-#
-# Creating a pid file is best effort: if Redis is not able to create it
-# nothing bad happens, the server will start and run normally.
+daemonize {{ redis_general.daemonize | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+{% set _supervised = "auto" %}
+{% if redis_general.supervised is defined and
+      redis_general.supervised | string | length > 0 and
+      redis_general.supervised in  ["no", "upstart", "systemd", "auto"] %}
+  {% set _supervised = redis_general.supervised %}
+{% endif %}
+supervised {{ _supervised }}
 pidfile /run/redis/{{ redis_daemon }}.pid
-
-# Specify the server verbosity level.
-# This can be one of:
-# debug (a lot of information, useful for development/testing)
-# verbose (many rarely useful info, but not a mess like the debug level)
-# notice (moderately verbose, what you want in production probably)
-# warning (only very important / critical messages are logged)
-loglevel {{ redis_general.loglevel }}
-
-# Specify the log file name. Also the empty string can be used to force
-# Redis to log on the standard output. Note that if you use standard
-# output for logging but daemonize, logs will be sent to /dev/null
-# logfile /var/log/redis/redis-server.log
+{% set _loglevel = "warning" %}
+{% if redis_general.loglevel is defined and
+      redis_general.loglevel | string | length > 0 and
+      redis_general.loglevel in  ["debug", "verbose", "notice", "warning"] %}
+  {% set _loglevel = redis_general.loglevel %}
+{% endif %}
+loglevel {{ _loglevel }}
+{% if redis_general.logfile is defined and
+      redis_general.logfile | string | length > 0 %}
 logfile {{ redis_general.logfile }}
-
-# To enable logging to the system logger, just set 'syslog-enabled' to yes,
-# and optionally update the other syslog parameters to suit your needs.
-# syslog-enabled no
-
-# Specify the syslog identity.
-# syslog-ident redis
-
-# Specify the syslog facility. Must be USER or between LOCAL0-LOCAL7.
-# syslog-facility local0
-
-# Set the number of databases. The default database is DB 0, you can select
-# a different one on a per-connection basis using SELECT <dbid> where
-# dbid is a number between 0 and 'databases'-1
+{% endif %}
+{% if redis_general.syslog.enabled is defined and
+      redis_general.syslog.enabled | string | length > 0 and
+      redis_general.syslog.enabled %}
+syslog-enabled {{ redis_general.syslog.enabled | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% if redis_general.syslog.ident is defined and
+        redis_general.syslog.ident | string | length > 0 %}
+syslog-ident {{ redis_general.syslog.ident }}
+  {% endif %}
+  {% set _facility = "local0" %}
+  {% if redis_general.syslog.facility is defined and
+        redis_general.syslog.facility | string | length > 0 and
+        redis_general.syslog.facility in ["local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7"] %}
+    {% set _facility = redis_general.syslog.facility %}
+  {% endif %}
+syslog-facility {{ _facility }}
+{% endif %}
+{% if redis_general.databases is defined and
+      redis_general.databases | string | length > 0 %}
 databases {{ redis_general.databases }}
-
-{% if ansible_distribution_major_version | int > 10 %}
-# By default Redis shows an ASCII art logo only when started to log to the
-# standard output and if the standard output is a TTY. Basically this means
-# that normally a logo is displayed only in interactive sessions.
-#
-# However it is possible to force the pre-4.0 behavior and always show a
-# ASCII art logo in startup logs by setting the following option to yes.
-always-show-logo {{ redis_general.show_logo | bool | ternary('yes', 'no') }}
+{% endif %}
+{% if redis_general.show_logo is defined and
+      redis_general.show_logo | string | length > 0 %}
+  {% if ansible_distribution_major_version | int > 10 %}
+always-show-logo {{ redis_general.show_logo | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% endif %}
 {% endif %}

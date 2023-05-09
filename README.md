@@ -1,7 +1,7 @@
 
 # Ansible Role:  `redis`
 
-Install and configure a *redis server*, or *redis cluster* including a *redis sentinel*.
+Install and configure a *redis  .
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-redis/main.yml?branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-redis)][issues]

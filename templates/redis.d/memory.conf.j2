@@ -1,0 +1,24 @@
+############################## MEMORY MANAGEMENT ################################
+
+{% if redis_memory is defined and
+      redis_memory | count > 0 %}
+  {% if redis_memory.maxmemory is defined and
+        redis_memory.maxmemory | string | length > 0 %}
+maxmemory {{ redis_memory.maxmemory }}
+  {% endif %}
+  {% set _memory_policy = "noeviction" %}
+  {% if redis_memory.maxmemory_policy is defined and
+        redis_memory.maxmemory_policy | string | length > 0 and
+        redis_memory.maxmemory_policy in ["volatile-lru", "allkeys-lru", "volatile-lfu", "allkeys-lfu", "volatile-random", "allkeys-random", "volatile-ttl", "noeviction"] %}
+    {% set _memory_policy = redis_memory.maxmemory_policy %}
+  {% endif %}
+maxmemory-policy {{ _memory_policy }}
+  {% if redis_memory.maxmemory_samples is defined and
+        redis_memory.maxmemory_samples | string | length > 0 %}
+maxmemory-samples {{ redis_memory.maxmemory_samples }}
+  {% endif %}
+  {% if redis_memory.replica_ignore_maxmemory is defined and
+        redis_memory.replica_ignore_maxmemory | string | length > 0 %}
+replica-ignore-maxmemory {{ redis_memory.replica_ignore_maxmemory | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+  {% endif %}
+{% endif %}

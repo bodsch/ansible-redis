@@ -20,6 +20,8 @@ platforms:
     pre_build_image: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # needs only by ubuntu 20.04
+      - /var/lib/docker/overlay2:/var/lib/docker/overlay2:rw
     groups:
       - redis
       - redis_sentinel
@@ -96,7 +98,7 @@ provisioner:
   name: ansible
   ansible_args:
     - --diff
-    # - -vv
+    - -v
   config_options:
     defaults:
       deprecation_warnings: True
