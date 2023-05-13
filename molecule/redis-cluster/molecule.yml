@@ -12,7 +12,7 @@ lint: |
   flake8 .
 
 platforms:
-  - name: "redis_cluster_master"
+  - name: "redis_cluster_primary"
     image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
@@ -41,6 +41,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - redis
+      - redis_replica
     networks:
       - name: redis_cluster
         ipv4_address: "10.12.0.2"
@@ -55,6 +56,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - redis
+      - redis_replica
     networks:
       - name: redis_cluster
         ipv4_address: "10.12.0.3"

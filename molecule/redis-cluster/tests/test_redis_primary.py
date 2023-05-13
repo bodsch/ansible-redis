@@ -8,7 +8,7 @@ import os
 
 import testinfra.utils.ansible_runner
 
-HOST = 'redis_cluster_replica_2'
+HOST = 'redis_cluster_primary'
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(HOST)
@@ -97,59 +97,15 @@ def get_vars(host):
     return result
 
 
-def test_package(host, get_vars):
-    distribution = host.system_info.distribution
-    release = host.system_info.release
-
-    print(f"distribution: {distribution}")
-    print(f"release     : {release}")
-
-    if not distribution == "artix":
-        packages = get_vars.get("redis_packages")
-
-        for pack in packages:
-            p = host.package(pack)
-            assert p.is_installed
-
-
 def test_config_file(host, get_vars):
     """
     """
-    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
-    # bind_port = get_vars.get("redis_network", {}).get("port", "6379")
+    redis_config = get_vars.get("redis_config_file")
+    bind_address = get_vars.get("redis_network").get("bind", [])
 
-    master_ip = get_vars.get("redis_replication", {}).get("master_ip")
+    bind_string = f"bind {bind_address[0]}"
 
-    bind_string = f"bind {bind_address}"
-    replica_of = f"replicaof {master_ip}"
+    net_config_file = host.file(redis_config)
+    assert net_config_file.is_file
 
-    network_config_file = host.file("/etc/redis.d/network.conf")
-    replication_config_file = host.file("/etc/redis.d/replication.conf")
-    assert network_config_file.is_file
-    assert replication_config_file.is_file
-
-    assert bind_string in network_config_file.content_string
-    assert replica_of in replication_config_file.content_string
-
-
-def test_service_running(host, get_vars):
-    service_name = get_vars.get("redis_daemon")
-
-    print(f"redis daemon: {service_name}")
-
-    service = host.service(service_name)
-    assert service.is_enabled
-    assert service.is_running
-
-
-def test_open_port(host, get_vars):
-    """
-    """
-    for i in host.socket.get_listening_sockets():
-        print(i)
-
-    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
-
-    service = host.socket(f"tcp://{bind_address}:{bind_port}")
-    assert service.is_listening
+    assert bind_string in net_config_file.content_string

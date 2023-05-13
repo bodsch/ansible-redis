@@ -1,7 +1,7 @@
-#jinja2: trim_blocks: True, lstrip_blocks: True
-# {{ ansible_managed }}
+
 ############################### ADVANCED CONFIG ###############################
 
+{#
 # Hashes are encoded using a memory efficient data structure when they have a
 # small number of entries, and the biggest entry does not exceed a given
 # threshold. These thresholds can be configured using the following directives.
@@ -244,3 +244,4 @@ rdb-save-incremental-fsync yes
 #
 # lfu-log-factor 10
 # lfu-decay-time 1
+#}

@@ -5,10 +5,6 @@ __metaclass__ = type
 
 from ansible.utils.display import Display
 
-import json
-from ruamel.yaml import YAML
-import itertools
-
 display = Display()
 
 
@@ -16,6 +12,7 @@ class FilterModule(object):
     """
       ansible filter
     """
+
     def filters(self):
         return {
             'network_bind': self.network_bind

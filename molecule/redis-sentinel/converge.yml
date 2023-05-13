@@ -1,7 +1,7 @@
 ---
 
 - name: converge
-  hosts: instance
+  hosts: all
   any_errors_fatal: false
   become: false
 

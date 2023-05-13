@@ -1,6 +1,7 @@
+
 ################################ LATENCY MONITOR ##############################
 
 {% if redis_latency.monitor_threshold is defined and
-      redis_latency.lazyfree_lazy_eviction | string | length > 0 %}
+      redis_latency.monitor_threshold | string | length > 0 %}
 latency-monitor-threshold {{ redis_latency.monitor_threshold }}
 {% endif %}

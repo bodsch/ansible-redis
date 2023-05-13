@@ -1,7 +1,7 @@
-#jinja2: trim_blocks: True, lstrip_blocks: True
-# {{ ansible_managed }}
+
 ################################### CLIENTS ####################################
 
+{#
 # Set the max number of connected clients at the same time. By default
 # this limit is set to 10000 clients, however if the Redis server is not
 # able to configure the process file limit to allow for the specified limit
@@ -12,3 +12,4 @@
 # an error 'max number of clients reached'.
 #
 # maxclients 10000
+#}

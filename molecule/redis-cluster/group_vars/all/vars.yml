@@ -1,7 +1,8 @@
 ---
 
 redis_network:
-  bind: "0.0.0.0"
+  bind:
+    - "0.0.0.0"
 
 redis_replication:
   master_ip: '10.12.0.1'

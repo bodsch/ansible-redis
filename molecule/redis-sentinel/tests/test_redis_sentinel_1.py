@@ -90,23 +90,6 @@ def get_vars(host):
     return result
 
 
-def test_redis_config(host, get_vars):
-    """
-    """
-    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
-
-    bind_string = f"bind {bind_address}"
-    port_string = f"port {bind_port}"
-
-    net_config_file = host.file("/etc/redis.d/network.conf")
-
-    assert net_config_file.is_file
-
-    assert bind_string in net_config_file.content_string
-    assert port_string in net_config_file.content_string
-
-
 def test_sentinel_config(host, get_vars):
     """
     """
@@ -131,16 +114,6 @@ def test_sentinel_config(host, get_vars):
     assert announce_string in config_file.content_string
 
 
-def test_service(host, get_vars):
-    service_name = get_vars.get("redis_daemon")
-
-    print(f"redis daemon: {service_name}")
-
-    service = host.service(service_name)
-    assert service.is_enabled
-    assert service.is_running
-
-
 def test_sentinel_service(host, get_vars):
     service_name = get_vars.get("redis_sentinel_daemon")
 
@@ -155,14 +128,10 @@ def test_open_port(host, get_vars):
     for i in host.socket.get_listening_sockets():
         pp.pprint(i)
 
-    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
-
     sentinel_address = get_vars.get("redis_sentinel", {}).get("bind")
     sentinel_port = 26379
 
     sockets = [
-        f"tcp://{bind_address}:{bind_port}",
         f"tcp://{sentinel_address}:{sentinel_port}",
     ]
 

@@ -59,6 +59,11 @@
 
 - name: merge redis configuration between defaults and custom
   ansible.builtin.set_fact:
+    redis_defragmentation: "{{ redis_defaults_defragmentation | combine(redis_defragmentation, recursive=True) }}"
+    redis_advanced: "{{ redis_defaults_advanced | combine(redis_advanced, recursive=True) }}"
+    redis_clients: "{{ redis_defaults_clients | combine(redis_clients, recursive=True) }}"
+    redis_cluster_docker: "{{ redis_defaults_cluster_docker | combine(redis_cluster_docker, recursive=True) }}"
+    redis_events_notification: "{{ redis_defaults_events_notification | combine(redis_events_notification, recursive=True) }}"
     redis_general: "{{ redis_defaults_general | combine(redis_general, recursive=True) }}"
     redis_append: "{{ redis_defaults_append | combine(redis_append, recursive=True) }}"
     redis_cluster: "{{ redis_defaults_cluster | combine(redis_cluster, recursive=True) }}"
@@ -67,8 +72,6 @@
     redis_lazy: "{{ redis_defaults_lazy | combine(redis_lazy, recursive=True) }}"
     redis_lua: "{{ redis_defaults_lua | combine(redis_lua, recursive=True) }}"
     redis_latency: "{{ redis_defaults_latency | combine(redis_latency, recursive=True) }}"
-
-
     redis_replication: "{{ redis_defaults_replication | combine(redis_replication, recursive=True) }}"
     redis_security: "{{ redis_defaults_security | combine(redis_security, recursive=True) }}"
     redis_slowlog: "{{ redis_defaults_slowlog | combine(redis_slowlog, recursive=True) }}"

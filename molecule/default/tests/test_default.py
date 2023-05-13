@@ -124,10 +124,7 @@ def test_directories(host, dirs):
 
 
 def test_files(host, get_vars):
-    redis_files = [
-        "/etc/redis.d/general.conf",
-        "/etc/redis.d/network.conf",
-    ]
+    redis_files = []
 
     redis_files.append(get_vars.get("redis_config_file"))
 
@@ -159,11 +156,14 @@ def test_open_port(host, get_vars):
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
+    bind_address = get_vars.get("redis_network", {}).get("bind", ["127.0.0.1"])
     bind_port = get_vars.get("redis_network", {}).get("port", "6379")
 
     print(f"address: {bind_address}")
     print(f"port   : {bind_port}")
 
-    service = host.socket(f"tcp://{bind_address}:{bind_port}")
-    assert service.is_listening
+    for address in bind_address:
+        if "ansible_default_ipv4.address" in address:
+            continue
+        service = host.socket(f"tcp://{address}:{bind_port}")
+        assert service.is_listening

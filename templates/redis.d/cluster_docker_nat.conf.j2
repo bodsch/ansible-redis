@@ -1,7 +1,7 @@
-#jinja2: trim_blocks: True, lstrip_blocks: True
-# {{ ansible_managed }}
+
 ########################## CLUSTER DOCKER/NAT support  ########################
 
+{#
 # In certain deployments, Redis Cluster nodes address discovery fails, because
 # addresses are NAT-ted or because ports are forwarded (the typical case is
 # Docker and other containers).
@@ -32,3 +32,4 @@
 # cluster-announce-ip 10.1.1.5
 # cluster-announce-port 6379
 # cluster-announce-bus-port 6380
+#}

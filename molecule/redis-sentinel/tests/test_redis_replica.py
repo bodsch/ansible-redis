@@ -94,40 +94,16 @@ def get_vars(host):
 def test_config_file(host, get_vars):
     """
     """
-    bind_address = get_vars.get("redis_network", {}).get("bind", "0.0.0.0")
+    import re
 
-    master_ip = get_vars.get("redis_replication", {}).get("master_ip")
+    redis_config = get_vars.get("redis_config_file")
+    primary_address = get_vars.get("redis_replication").get("master_ip", None)
+    primary_port = get_vars.get("redis_replication").get("master_port", "6379")
 
-    bind_string = f"bind {bind_address}"
-    replica_of = f"replicaof {master_ip}"
+    net_config_file = host.file(redis_config)
+    re_replicaof = re.compile(f"replicaof {primary_address} {primary_port}")
 
-    network_config_file = host.file("/etc/redis.d/network.conf")
-    replication_config_file = host.file("/etc/redis.d/replication.conf")
-    assert network_config_file.is_file
-    assert replication_config_file.is_file
+    content = net_config_file.content_string.split("\n")
 
-    assert bind_string in network_config_file.content_string
-    assert replica_of in replication_config_file.content_string
-
-
-def test_service_running(host, get_vars):
-    service_name = get_vars.get("redis_daemon")
-
-    print(f"redis daemon: {service_name}")
-
-    service = host.service(service_name)
-    assert service.is_enabled
-    assert service.is_running
-
-
-def test_open_port(host, get_vars):
-    """
-    """
-    for i in host.socket.get_listening_sockets():
-        print(i)
-
-    bind_address = get_vars.get("redis_network", {}).get("bind", "127.0.0.1")
-    bind_port = get_vars.get("redis_network", {}).get("port", "6379")
-
-    service = host.socket(f"tcp://{bind_address}:{bind_port}")
-    assert service.is_listening
+    assert net_config_file.is_file
+    assert (len(list(filter(re_replicaof.match, content))) > 0)

@@ -14,6 +14,17 @@ redis_daemon: redis-server
 redis_sentinel_config_file: /etc/redis/sentinel.conf
 redis_sentinel_daemon: redis-sentinel
 
+
+redis_defaults_defragmentation: {}
+
+redis_defaults_advanced: {}
+
+redis_defaults_clients: {}
+
+redis_defaults_cluster_docker: {}
+
+redis_defaults_events_notification: {}
+
 redis_defaults_general:
   # debug (a lot of information, useful for development/testing)
   # verbose (many rarely useful info, but not a mess like the debug level)
@@ -98,7 +109,7 @@ redis_defaults_cluster:
 
 redis_defaults_replication:
   master_ip: ""
-  master_port: "" # 6379
+  master_port: "6379" # 6379
   masterauth: ""
   replica_serve_stale_data: "" # true
   replica_read_only: "" # true
