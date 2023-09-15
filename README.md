@@ -13,6 +13,21 @@ Install and configure a *redis  .
 [releases]: https://github.com/bodsch/ansible-redis/releases
 [quality]: https://galaxy.ansible.com/bodsch/redis
 
+## Requirements & Dependencies
+
+Ansible Collections
+
+- [bodsch.core](https://github.com/bodsch/ansible-collection-core)
+
+```bash
+ansible-galaxy collection install bodsch.core
+```
+or
+```bash
+ansible-galaxy collection install --requirements-file collections.yml
+```
+
+
 ## tested operating systems
 
 Tested on
@@ -32,25 +47,6 @@ see [defaults/main.yml](defaults/main.yml)
 ```yaml
 redis_include_path: /etc/redis.d
 redis_data_dir: /var/lib/redis
-
-redis_includes:
-  - active_defragmentation.conf
-  # - advanced_config.conf
-  # - append_only.conf
-  - clients.conf
-  - cluster_docker_nat.conf
-  - event_notification.conf
-  - general.conf
-  - latency_monitor.conf
-  # - lazy_freeing.conf
-  - lua_scripting.conf
-  - memory_management.conf
-  - network.conf
-  - redis_cluster.conf
-  # - replication.conf
-  - security.conf
-  - slow_log.conf
-  - snapshotting.conf
 
 # general
 redis_general:
@@ -76,7 +72,8 @@ redis_memory:
 
 # network
 redis_network:
-  bind: 127.0.0.1
+  bind:
+    - 127.0.0.1
   port: 6379
   tcp_backlog: 511
   unixsocket: ''
@@ -128,4 +125,4 @@ redis_sentinel:
 
 [Apache](LICENSE)
 
-`FREE SOFTWARE, HELL YEAH!`
+**FREE SOFTWARE, HELL YEAH!**

@@ -158,8 +158,8 @@ redis_defaults_sentinel:
   master: ''
   announce_ip: ''
   dir: "{{ redis_data_dir }}"
-  auth:
-    username: password
+  auth: {}
+  #  username: password
   down_after_milliseconds: 300
   parallel_syncs: 1
   failover_timeout: 1000
