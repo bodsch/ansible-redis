@@ -2,7 +2,6 @@
 galaxy_info:
 
   role_name: redis
-  namespace: bodsch
 
   author: Bodo Schulz
   description: ansible role to install redis server, redis cluster with redis sentinel
