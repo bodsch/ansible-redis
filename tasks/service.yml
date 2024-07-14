@@ -9,6 +9,19 @@
     - redis
     - redis_service
 
+- name: ensure redis-sentinel is stopped and disable on boot
+  ansible.builtin.service:
+    name: "{{ redis_sentinel_daemon }}"
+    enabled: "{{ redis_sentinel.enabled }}"
+    state: "{{ 'stopped' if not redis_sentinel.enabled else 'started' }}"
+  when:
+    - redis_sentinel.enabled is defined
+    - not redis_sentinel.enabled
+  tags:
+    - redis
+    - redis_service
+    - redis_sentinel
+
 - name: ensure redis-sentinel is running and enabled on boot
   ansible.builtin.service:
     name: "{{ redis_sentinel_daemon }}"
@@ -24,4 +37,5 @@
     - redis
     - redis_service
     - redis_sentinel
+
 ...

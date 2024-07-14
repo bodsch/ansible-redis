@@ -2,6 +2,7 @@
 galaxy_info:
 
   role_name: redis
+  namespace: bodsch
 
   author: Bodo Schulz
   description: ansible role to install redis server, redis cluster with redis sentinel
@@ -14,10 +15,12 @@ galaxy_info:
     - name: Debian
       versions:
         - bullseye
+        - bookworm
     - name: Ubuntu
       versions:
-        # 20.04
         - focal
+        - jammy
+        - lunar
 
   galaxy_tags:
     - redis

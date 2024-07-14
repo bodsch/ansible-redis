@@ -8,21 +8,22 @@ dependency:
 driver:
   name: docker
 
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
-  flake8 .
-
 platforms:
   - name: "redis_cluster_primary"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
     docker_networks:
@@ -35,13 +36,20 @@ platforms:
         ipv4_address: "10.12.0.1"
 
   - name: "redis_cluster_replica_1"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_replica
@@ -50,13 +58,20 @@ platforms:
         ipv4_address: "10.12.0.2"
 
   - name: "redis_cluster_replica_2"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_replica

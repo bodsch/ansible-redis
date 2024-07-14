@@ -8,23 +8,22 @@ dependency:
 driver:
   name: docker
 
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
-  flake8 .
-
 platforms:
   - name: "redis_sentinel_1"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      # needs only by ubuntu 20.04
-      - /var/lib/docker/overlay2:/var/lib/docker/overlay2:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_sentinel
@@ -38,13 +37,20 @@ platforms:
         ipv4_address: "10.13.1.1"
 
   - name: "redis_sentinel_2"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_sentinel
@@ -53,13 +59,20 @@ platforms:
         ipv4_address: "10.13.1.2"
 
   - name: "redis_sentinel_3"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_sentinel
@@ -68,13 +81,20 @@ platforms:
         ipv4_address: "10.13.1.3"
 
   - name: "redis_primary"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_primary
@@ -83,13 +103,20 @@ platforms:
         ipv4_address: "10.13.1.10"
 
   - name: "redis_replica_1"
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    cgroupns_mode: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/lib/containerd
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
     groups:
       - redis
       - redis_replica
