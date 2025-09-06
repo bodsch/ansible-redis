@@ -1,51 +1,85 @@
 ---
 
+- name: merge redis configuration between defaults and custom
+  ansible.builtin.set_fact:
+    redis_defragmentation: "{{ redis_defaults_defragmentation | combine(redis_defragmentation, recursive=True) }}"
+    redis_advanced: "{{ redis_defaults_advanced | combine(redis_advanced, recursive=True) }}"
+    redis_clients: "{{ redis_defaults_clients | combine(redis_clients, recursive=True) }}"
+    redis_cluster_docker: "{{ redis_defaults_cluster_docker | combine(redis_cluster_docker, recursive=True) }}"
+    redis_events_notification: "{{ redis_defaults_events_notification | combine(redis_events_notification, recursive=True) }}"
+    redis_general: "{{ redis_defaults_general | combine(redis_general, recursive=True) }}"
+    redis_append: "{{ redis_defaults_append | combine(redis_append, recursive=True) }}"
+    redis_cluster: "{{ redis_defaults_cluster | combine(redis_cluster, recursive=True) }}"
+    redis_memory: "{{ redis_defaults_memory | combine(redis_memory, recursive=True) }}"
+    redis_network: "{{ redis_defaults_network | combine(redis_network, recursive=True) }}"
+    redis_lazy: "{{ redis_defaults_lazy | combine(redis_lazy, recursive=True) }}"
+    redis_lua: "{{ redis_defaults_lua | combine(redis_lua, recursive=True) }}"
+    redis_latency: "{{ redis_defaults_latency | combine(redis_latency, recursive=True) }}"
+    redis_replication: "{{ redis_defaults_replication | combine(redis_replication, recursive=True) }}"
+    redis_security: "{{ redis_defaults_security | combine(redis_security, recursive=True) }}"
+    redis_slowlog: "{{ redis_defaults_slowlog | combine(redis_slowlog, recursive=True) }}"
+    redis_snapshot: "{{ redis_defaults_snapshot | combine(redis_snapshot, recursive=True) }}"
+    redis_sentinel: "{{ redis_defaults_sentinel | combine(redis_sentinel, recursive=True) }}"
+  tags:
+    - redis
+    - redis_configue
+
+- name: detect installed valkey
+  ansible.builtin.stat:
+    path: /usr/bin/valkey-server
+  register: valkey_binary
+  tags:
+    - redis
+    - redis_configue
+
+- name: re-define variables for valkey
+  when:
+    - valkey_binary.stat.exists | default('false')
+    - ansible_distribution | lower == "archlinux"
+  ansible.builtin.set_fact:
+    redis_config_file: /etc/valkey/valkey.conf
+    redis_daemon: valkey
+    redis_sentinel_config_file: /etc/valkey/sentinel.conf
+    redis_sentinel_daemon: valkey-sentinel
+    redis_data_dir: /var/lib/valkey
+    redis_system: "{{ redis_system | redis_to_valkey() }}"
+    redis_general: "{{ redis_general | redis_to_valkey() }}"
+    redis_snapshot: "{{ redis_snapshot | redis_to_valkey() }}"
+    redis_sentinel: "{{ redis_sentinel | redis_to_valkey() }}"
+  tags:
+    - redis
+    - redis_configue
+
+- name: get version of installed redis
+  redis_version:
+  register: package_version
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: redis
+    facts:
+      server: "{{ package_version.server }}"
+      version: "{{ package_version.version }}"
+      owner: "{{ redis_system.owner }}"
+      group: "{{ redis_system.group }}"
+      data_dir: "{{ redis_data_dir }}"
+
 - name: create logging directory {{ redis_general.logfile | dirname }}
   ansible.builtin.file:
     path: "{{ redis_general.logfile | dirname }}"
     state: directory
-    group: redis
+    group: "{{ redis_system.group }}"
     mode: 0775
   tags:
     - redis
     - redis_configure
-
-# - name: create splitted redis configuration
-#   ansible.builtin.template:
-#     src: redis.d/{{ item }}.j2
-#     dest: /etc/redis.d/{{ item }}
-#     mode: 0644
-#     group: redis
-#   loop:
-#     - active_defragmentation.conf
-#     - advanced_config.conf
-#     - append_only.conf
-#     - clients.conf
-#     - cluster_docker_nat.conf
-#     - event_notification.conf
-#     - general.conf
-#     - latency_monitor.conf
-#     - lazy_freeing.conf
-#     - lua_scripting.conf
-#     - memory_management.conf
-#     - network.conf
-#     - redis_cluster.conf
-#     - replication.conf
-#     - security.conf
-#     - slow_log.conf
-#     - snapshotting.conf
-#   notify:
-#     - restart redis
-#   tags:
-#     - redis
-#     - redis_configure
 
 - name: write redis configuration
   ansible.builtin.template:
     src: redis.conf.j2
     dest: "{{ redis_config_file }}"
     mode: 0644
-    group: redis
+    group: "{{ redis_system.group }}"
     backup: true
   notify:
     - restart redis
@@ -76,7 +110,7 @@
         src: sentinel.conf.j2
         dest: "{{ redis_sentinel_config_file }}"
         mode: 0664
-        group: redis
+        group: "{{ redis_system.group }}"
         backup: true
       notify:
         - restart redis-sentinel

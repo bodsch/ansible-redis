@@ -99,6 +99,20 @@ def get_vars(host):
     return result
 
 
+def local_facts(host):
+    """
+        return local fact
+    """
+    local_fact = host.ansible("setup").get("ansible_facts").get("ansible_local")
+
+    print(f"local_fact     : {local_fact}")
+
+    if local_fact:
+        return local_fact.get("redis", {})
+    else:
+        return dict()
+
+
 def test_package(host, get_vars):
     distribution = host.system_info.distribution
     release = host.system_info.release
@@ -114,32 +128,44 @@ def test_package(host, get_vars):
             assert p.is_installed
 
 
-@pytest.mark.parametrize("dirs", [
-    "/etc/redis.d",
-])
-def test_directories(host, dirs):
-    d = host.file(dirs)
-    assert d.is_directory
-    assert d.exists
-
-
 def test_files(host, get_vars):
     redis_files = []
 
-    redis_files.append(get_vars.get("redis_config_file"))
+    _owner = local_facts(host).get("owner")
+
+    print(f"owner     : {_owner}")
+
+    config_file = get_vars.get("redis_config_file")
+
+    print(f"config_file  : {config_file}")
+
+    if _owner == "valkey":
+        config_file = config_file.replace("redis", "valkey")
+
+    print(f"config_file  : {config_file}")
+
+    redis_files.append(config_file)
 
     for files in redis_files:
         f = host.file(files)
-        assert f.exists
         assert f.is_file
 
 
-def test_user(host):
-    assert host.group("redis").exists
-    assert host.user("redis").exists
-    assert "redis" in host.user("redis").groups
+def test_user(host, get_vars):
+
+    _owner = local_facts(host).get("owner")
+    _group = local_facts(host).get("group")
+    _data_dir = local_facts(host).get("data_dir")
+
+    print(f"owner     : {_owner}")
+    print(f"group     : {_group}")
+    print(f"data dir  : {_data_dir}")
+
+    assert host.group(_group).exists
+    assert host.user(_owner).exists
+    assert _owner in host.user(_owner).groups
     # assert host.user("redis").shell == "/sbin/nologin"
-    assert host.user("redis").home == "/var/lib/redis"
+    assert host.user(_owner).home == _data_dir
 
 
 def test_service(host, get_vars):

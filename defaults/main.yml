@@ -3,6 +3,10 @@
 redis_include_path: /etc/redis.d
 redis_data_dir: /var/lib/redis
 
+redis_system:
+  owner: redis
+  group: redis
+
 redis_defragmentation: {}
 redis_advanced: {}
 redis_clients: {}

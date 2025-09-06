@@ -4,10 +4,10 @@ redis_requirements:
   - iproute2
 
 redis_packages:
-  - redis
+  - valkey
 
 redis_config_file: /etc/redis/redis.conf
-redis_daemon: redis
+redis_daemon: valkey
 
 redis_sentinel_config_file: /etc/redis/sentinel.conf
 
