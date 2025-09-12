@@ -35,7 +35,7 @@
 - name: re-define variables for valkey
   when:
     - valkey_binary.stat.exists | default('false')
-    - ansible_distribution | lower == "archlinux"
+    # - ansible_distribution | lower == "archlinux"
   ansible.builtin.set_fact:
     redis_config_file: /etc/valkey/valkey.conf
     redis_daemon: valkey

@@ -4,11 +4,11 @@ redis_requirements:
   - iproute2
 
 redis_packages:
-  - redis
-  - redis-openrc
+  - valkey
+  - valkey-openrc
 
 redis_config_file: /etc/redis/redis.conf
 
-redis_daemon: redis
+redis_daemon: valkey
 
 ...
