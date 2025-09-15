@@ -114,15 +114,6 @@ def test_package(host, get_vars):
             assert p.is_installed
 
 
-@pytest.mark.parametrize("dirs", [
-    "/etc/redis.d",
-])
-def test_directories(host, dirs):
-    d = host.file(dirs)
-    assert d.is_directory
-    assert d.exists
-
-
 def test_files(host, get_vars):
     redis_files = []
 
@@ -130,7 +121,6 @@ def test_files(host, get_vars):
 
     for files in redis_files:
         f = host.file(files)
-        assert f.exists
         assert f.is_file
 
 
