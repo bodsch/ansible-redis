@@ -1,20 +1,27 @@
 ---
 
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: ensure {{ redis_daemon }} is running and enabled on boot
   ansible.builtin.service:
     name: "{{ redis_daemon }}"
     state: started
     enabled: true
+  when:
+    - not running_in_check_mode
   tags:
     - redis
     - redis_service
 
 - name: ensure redis-sentinel is stopped and disable on boot
+
   ansible.builtin.service:
     name: "{{ redis_sentinel_daemon }}"
     enabled: "{{ redis_sentinel.enabled }}"
     state: "{{ 'stopped' if not redis_sentinel.enabled else 'started' }}"
   when:
+    - not running_in_check_mode
     - redis_sentinel.enabled is defined
     - not redis_sentinel.enabled
   tags:
@@ -28,11 +35,12 @@
     enabled: "{{ redis_sentinel.enabled }}"
     state: "{{ redis_sentinel.state }}"
   when:
+    - not running_in_check_mode
     - redis_sentinel.enabled is defined
     - redis_sentinel.enabled
     - redis_sentinel.master is defined
     - redis_sentinel.master | string | length > 0
-    - redis_sentinel.master | ansible.utils.ipaddr('address')
+    - redis_sentinel.master | ansible.utils.ipaddr('address') | length > 0
   tags:
     - redis
     - redis_service

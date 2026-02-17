@@ -3,8 +3,8 @@
 
 {% if redis_replication.master_ip is defined and
       redis_replication.master_ip | string | length > 0 and
-      redis_replication.master_ip | ansible.utils.ipaddr('address') and
-      (not redis_replication.master_ip == ansible_default_ipv4.address) %}
+      redis_replication.master_ip | ansible.utils.ipaddr('address') | length > 0 and
+      (not redis_replication.master_ip == ansible_facts.default_ipv4.address) %}
 replicaof {{ redis_replication.master_ip }} {{ redis_replication.master_port | default('6379') }}
 {% endif %}
 {% if redis_replication.masterauth is defined and

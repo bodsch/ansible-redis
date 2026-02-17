@@ -87,12 +87,10 @@ provisioner:
   config_options:
     defaults:
       deprecation_warnings: true
-      stdout_callback: yaml
+      callback_result_format: yaml
       callbacks_enabled: profile_tasks
       gathering: smart
-      fact_caching: jsonfile
-      fact_caching_timeout: 8640
-      fact_caching_connection: "${MOLECULE_EPHEMERAL_DIRECTORY}/ansible_facts"
+      fact_caching_timeout: 320
 
 scenario:
   test_sequence:
@@ -101,6 +99,7 @@ scenario:
     - create
     - prepare
     - converge
+    - idempotence
     - verify
     - destroy
 

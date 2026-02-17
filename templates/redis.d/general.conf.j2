@@ -43,7 +43,7 @@ databases {{ redis_general.databases }}
 {% endif %}
 {% if redis_general.show_logo is defined and
       redis_general.show_logo | string | length > 0 %}
-  {% if ansible_distribution_major_version | int > 10 %}
+  {% if ansible_facts.distribution_major_version | int > 10 %}
 always-show-logo {{ redis_general.show_logo | bool | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% endif %}
 {% endif %}
