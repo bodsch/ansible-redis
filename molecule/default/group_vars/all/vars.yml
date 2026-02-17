@@ -22,7 +22,7 @@ redis_includes:
 redis_network:
   bind:
     - 127.0.0.1
-    - "{{ ansible_default_ipv4.address }}"
+    - "{{ ansible_facts.default_ipv4.address }}"
 
 redis_general_loglevel: verbose
 

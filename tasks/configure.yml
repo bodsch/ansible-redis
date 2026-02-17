@@ -28,6 +28,8 @@
   ansible.builtin.stat:
     path: /usr/bin/valkey-server
   register: valkey_binary
+  when:
+    - not running_in_check_mode
   tags:
     - redis
     - redis_configue
@@ -35,7 +37,7 @@
 - name: re-define variables for valkey
   when:
     - valkey_binary.stat.exists | default('false')
-    # - ansible_distribution | lower == "archlinux"
+    # - ansible_facts.distribution | lower == "archlinux"
   ansible.builtin.set_fact:
     redis_config_file: /etc/valkey/valkey.conf
     redis_daemon: valkey
@@ -53,6 +55,8 @@
 - name: get version of installed redis
   redis_version:
   register: package_version
+  when:
+    - not running_in_check_mode
 
 - name: create custom fact file
   bodsch.core.facts:
@@ -63,13 +67,17 @@
       owner: "{{ redis_system.owner }}"
       group: "{{ redis_system.group }}"
       data_dir: "{{ redis_data_dir }}"
+  when:
+    - not running_in_check_mode
 
 - name: create logging directory {{ redis_general.logfile | dirname }}
   ansible.builtin.file:
     path: "{{ redis_general.logfile | dirname }}"
     state: directory
     group: "{{ redis_system.group }}"
-    mode: 0775
+    mode: "0775"
+  when:
+    - not running_in_check_mode
   tags:
     - redis
     - redis_configure
@@ -78,9 +86,11 @@
   ansible.builtin.template:
     src: redis.conf.j2
     dest: "{{ redis_config_file }}"
-    mode: 0644
+    mode: "0644"
     group: "{{ redis_system.group }}"
     backup: true
+  when:
+    - not running_in_check_mode
   notify:
     - restart redis
   tags:
@@ -89,11 +99,12 @@
 
 - name: sentinel support
   when:
+    - not running_in_check_mode
     - redis_sentinel.enabled is defined
     - redis_sentinel.enabled
     - redis_sentinel.master is defined
     - redis_sentinel.master | string | length > 0
-    - redis_sentinel.master | ipaddr('address')
+    - redis_sentinel.master | default('') | ansible.utils.ipaddr('address') | length > 0
   tags:
     - redis
     - redis_configure
@@ -103,13 +114,13 @@
       ansible.builtin.file:
         path: "{{ redis_sentinel_config_file | dirname }}"
         group: redis
-        mode: 0775
+        mode: "0775"
 
     - name: create redis-sentinel configuration
       ansible.builtin.template:
         src: sentinel.conf.j2
         dest: "{{ redis_sentinel_config_file }}"
-        mode: 0664
+        mode: "0664"
         group: "{{ redis_system.group }}"
         backup: true
       notify:

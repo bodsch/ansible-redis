@@ -1,4 +1,8 @@
 ---
+redis_network:
+  bind:
+    - "10.13.1.3"
+  port: 6379
 
 redis_sentinel:
   enabled: true
