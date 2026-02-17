@@ -1,5 +1,5 @@
 
-# Ansible Role:  `redis`
+# Ansible Role:  `bodsch.redis`
 
 Install and configure a *redis  .
 
