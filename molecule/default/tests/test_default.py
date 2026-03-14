@@ -1,4 +1,3 @@
-
 from __future__ import annotations, unicode_literals
 
 import os

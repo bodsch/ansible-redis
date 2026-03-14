@@ -25,6 +25,9 @@ redis_security: {}
 redis_slowlog: {}
 redis_snapshot: {}
 
+redis_sentinel_force_rebuild_conf: false
+
 redis_sentinel: {}
+
 
 ...
