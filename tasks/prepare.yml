@@ -39,18 +39,20 @@
     - redis_configue
 
 - name: install dependency
+  when:
+    - not running_in_check_mode
+    - redis_requirements | default([]) | count > 0
   ansible.builtin.package:
     name: "{{ redis_requirements }}"
     state: present
-  when:
-    - redis_requirements | default([]) | count > 0
-    - not running_in_check_mode
   tags:
     - redis
     - redis_prepare
     - redis_configue
 
 - name: re-read ansible facts
+  when:
+    - not running_in_check_mode
   ansible.builtin.setup:
   tags:
     - redis

@@ -1,6 +1,8 @@
 ---
 
 - name: merge redis configuration between defaults and custom
+  when:
+    - not running_in_check_mode
   ansible.builtin.set_fact:
     redis_defragmentation: "{{ redis_defaults_defragmentation | combine(redis_defragmentation, recursive=True) }}"
     redis_advanced: "{{ redis_defaults_advanced | combine(redis_advanced, recursive=True) }}"
@@ -23,19 +25,21 @@
   tags:
     - redis
     - redis_configue
+  no_log: true
 
 - name: detect installed valkey
+  when:
+    - not running_in_check_mode
   ansible.builtin.stat:
     path: /usr/bin/valkey-server
   register: valkey_binary
-  when:
-    - not running_in_check_mode
   tags:
     - redis
     - redis_configue
 
 - name: re-define variables for valkey
   when:
+    - not running_in_check_mode
     - valkey_binary.stat.exists | default('false')
     # - ansible_facts.distribution | lower == "archlinux"
   ansible.builtin.set_fact:
@@ -53,12 +57,14 @@
     - redis_configue
 
 - name: get version of installed redis
-  redis_version:
-  register: package_version
   when:
     - not running_in_check_mode
+  redis_version:
+  register: package_version
 
 - name: create custom fact file
+  when:
+    - not running_in_check_mode
   bodsch.core.facts:
     name: redis
     facts:
@@ -67,30 +73,28 @@
       owner: "{{ redis_system.owner }}"
       group: "{{ redis_system.group }}"
       data_dir: "{{ redis_data_dir }}"
-  when:
-    - not running_in_check_mode
 
 - name: create logging directory {{ redis_general.logfile | dirname }}
+  when:
+    - not running_in_check_mode
   ansible.builtin.file:
     path: "{{ redis_general.logfile | dirname }}"
     state: directory
     group: "{{ redis_system.group }}"
     mode: "0775"
-  when:
-    - not running_in_check_mode
   tags:
     - redis
     - redis_configure
 
 - name: write redis configuration
+  when:
+    - not running_in_check_mode
   ansible.builtin.template:
     src: redis.conf.j2
     dest: "{{ redis_config_file }}"
     mode: "0644"
     group: "{{ redis_system.group }}"
     backup: true
-  when:
-    - not running_in_check_mode
   notify:
     - restart redis
   tags:

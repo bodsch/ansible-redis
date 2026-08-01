@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 
 # (c) 2022-2023, Bodo Schulz <bodo@boone-schulz.de>
 # Apache-2.0 (see LICENSE or https://opensource.org/license/apache-2-0)
@@ -15,10 +14,10 @@ version (X.Y.Z) from stdout.
 It is read-only and supports check mode.
 """
 
-from __future__ import absolute_import, division, print_function
 
 import re
-from typing import List, Optional, Sequence, Tuple, TypedDict
+from collections.abc import Sequence
+from typing import TypedDict
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -102,7 +101,7 @@ class RedisVersionResult(TypedDict):
     """Result structure returned by :meth:`RedisVersion.run`."""
 
     stdout: str
-    stdout_lines: List[str]
+    stdout_lines: list[str]
     failed: bool
     server: str
     version: str
@@ -129,10 +128,10 @@ class RedisVersion:
             module: Ansible module instance used for binary discovery and command execution.
         """
         self._module = module
-        self._redis_binary: Optional[str] = module.get_bin_path(
+        self._redis_binary: str | None = module.get_bin_path(
             "redis-server", required=False
         )
-        self._valkey_binary: Optional[str] = module.get_bin_path(
+        self._valkey_binary: str | None = module.get_bin_path(
             "valkey-server", required=False
         )
 
@@ -185,7 +184,7 @@ class RedisVersion:
 
         return result
 
-    def _exec(self, argv: Sequence[str]) -> Tuple[int, str, str]:
+    def _exec(self, argv: Sequence[str]) -> tuple[int, str, str]:
         """
         Execute a command on the target.
 

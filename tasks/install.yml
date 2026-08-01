@@ -1,16 +1,18 @@
 ---
 
 - name: ensure redis is installed
+  when:
+    - not running_in_check_mode
   ansible.builtin.package:
     name: "{{ redis_packages }}"
     state: present
-  when:
-    - not running_in_check_mode
   tags:
     - redis
     - redis_install
 
 - name: get latest system information
+  when:
+    - not running_in_check_mode
   ansible.builtin.setup:
   tags:
     - redis
